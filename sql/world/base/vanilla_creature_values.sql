@@ -10718,9 +10718,6 @@ UPDATE `creature_template` SET `speed_walk` = 1.0 WHERE `entry`=5757;
 /*  Leo Sarn  */
 UPDATE `creature_template` SET `speed_walk` = 1.0 WHERE `entry`=5758;
 
-/*  Lord Azrethoc  */
-UPDATE `creature_template` SET `DamageModifier` = 2.0 WHERE `entry`=5760;
-
 /*  Deviate Shambler  */
 UPDATE `creature_template` SET `maxlevel` = 20, `speed_walk` = 0.666668, `DamageModifier` = 4.05 WHERE `entry`=5761;
 
@@ -18120,7 +18117,7 @@ UPDATE `creature_template` SET `ArmorModifier` = 1.3, `mingold` = 381176, `maxgo
 UPDATE `creature_template` SET `ArmorModifier` = 1.3, `mingold` = 1186290, `maxgold` = 1201890 WHERE `entry`=11983;
 
 /*  Golemagg the Incinerator  */
-UPDATE `creature_template` SET `speed_walk` = 0.777776, `DamageModifier` = 20.05, `ArmorModifier` = 1.3, `mingold` = 1069897, `maxgold` = 1307652 WHERE `entry`=11988;
+UPDATE `creature_template` SET `speed_walk` = 0.777776, `DamageModifier` = 22, `ArmorModifier` = 1.3, `mingold` = 1069897, `maxgold` = 1307652 WHERE `entry`=11988;
 
 /*  Rob Bridenbecker  */
 UPDATE `creature_template` SET `DamageModifier` = 0.9 WHERE `entry`=11994;
