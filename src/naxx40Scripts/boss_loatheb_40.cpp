@@ -22,6 +22,7 @@
 enum Spells
 {
     SPELL_NECROTIC_AURA                         = 55593,
+    SPELL_SUMMON_SPORE                          = 90006,
     SPELL_DEATHBLOOM                            = 29865,
     SPELL_INEVITABLE_DOOM                       = 29204,
     SPELL_BERSERK                               = 26662

@@ -32,6 +32,7 @@ enum Spells
     SPELL_SLIME_SPRAY                       = 28157,
     SPELL_POISON_CLOUD_DAMAGE_AURA          = 28158,
     SPELL_BERSERK                           = 26662,
+    SPELL_BOMBARD_SLIME                     = 90003 // update summon entry
 };
 
 enum Emotes
@@ -240,77 +241,140 @@ public:
     };
 };
 
-class spell_grobbulus_poison : public SpellScript
+class spell_grobbulus_poison : public SpellScriptLoader
 {
-    PrepareSpellScript(spell_grobbulus_poison);
+public:
+    spell_grobbulus_poison() : SpellScriptLoader("spell_grobbulus_poison") { }
 
-    void FilterTargets(std::list<WorldObject*>& targets)
+    class spell_grobbulus_poison_SpellScript : public SpellScript
     {
-        std::list<WorldObject*> tmplist;
-        for (auto& target : targets)
+        PrepareSpellScript(spell_grobbulus_poison_SpellScript);
+
+        void FilterTargets(std::list<WorldObject*>& targets)
         {
-            if (GetCaster()->IsWithinDist3d(target, 0.0f))
+            std::list<WorldObject*> tmplist;
+            for (auto& target : targets)
             {
-                tmplist.push_back(target);
+                if (GetCaster()->IsWithinDist3d(target, 0.0f))
+                {
+                    tmplist.push_back(target);
+                }
+            }
+            targets.clear();
+            for (auto& itr : tmplist)
+            {
+                targets.push_back(itr);
             }
         }
-        targets.clear();
-        for (auto& itr : tmplist)
-        {
-            targets.push_back(itr);
-        }
-    }
 
-    void Register() override
+        void Register() override
+        {
+            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
     {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_grobbulus_poison::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        return new spell_grobbulus_poison_SpellScript();
     }
 };
 
+
 // This will overwrite the declared 10 and 25 man mutating injection to handle all versions of the spell script
-class spell_grobbulus_mutating_injection_aura : public AuraScript
+class spell_grobbulus_mutating_injection_40 : public SpellScriptLoader
 {
-    PrepareAuraScript(spell_grobbulus_mutating_injection_aura);
+    public:
+        spell_grobbulus_mutating_injection_40() : SpellScriptLoader("spell_grobbulus_mutating_injection") { }
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_MUTATING_EXPLOSION });
-    }
-
-    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        switch (GetTargetApplication()->GetRemoveMode())
+        class spell_grobbulus_mutating_injection_40_AuraScript : public AuraScript
         {
-            case AURA_REMOVE_BY_ENEMY_SPELL:
-            case AURA_REMOVE_BY_EXPIRE:
-                if (auto caster = GetCaster())
-                {
-                    if (caster->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_HEROIC)
-                    {
-                        int32 modifiedMutatingExplosionDamage = 2379;
-                        caster->CastCustomSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, &modifiedMutatingExplosionDamage, 0, 0, true);
-                    }
-                    else
-                    {
-                        caster->CastSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, true);
-                    }
-                }
-                break;
-            default:
-                return;
-        }
-    }
+            PrepareAuraScript(spell_grobbulus_mutating_injection_40_AuraScript);
 
-    void Register() override
-    {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_grobbulus_mutating_injection_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                return ValidateSpellInfo({ SPELL_MUTATING_EXPLOSION });
+            }
+
+            void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+            {
+                switch (GetTargetApplication()->GetRemoveMode())
+                {
+                    case AURA_REMOVE_BY_ENEMY_SPELL:
+                    case AURA_REMOVE_BY_EXPIRE:
+                        if (auto caster = GetCaster())
+                        {
+                            if (caster->GetMap()->GetDifficulty() == RAID_DIFFICULTY_10MAN_HEROIC)
+                            {
+                                int32 modifiedMutatingExplosionDamage = 2379;
+                                caster->CastCustomSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, &modifiedMutatingExplosionDamage, 0, 0, true);
+                            }
+                            else
+                            {
+                                caster->CastSpell(GetTarget(), SPELL_MUTATING_EXPLOSION, true);
+                            }
+                        }
+                        break;
+                    default:
+                        return;
+                }
+            }
+
+            void Register() override
+            {
+                AfterEffectRemove += AuraEffectRemoveFn(spell_grobbulus_mutating_injection_40_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_grobbulus_mutating_injection_40_AuraScript();
+        }
+};
+
+
+class spell_grobbulus_poison_cloud_poison_40 : public SpellScriptLoader
+{
+    public:
+        spell_grobbulus_poison_cloud_poison_40() : SpellScriptLoader("spell_grobbulus_poison_cloud_poison_40") { }
+
+        class spell_grobbulus_poison_cloud_poison_40_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_grobbulus_poison_cloud_poison_40_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                return ValidateSpellInfo({ SPELL_POISON_CLOUD_POISON_DAMAGE }); // Poison trigger
+            }
+
+            void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
+            {
+                Unit* caster = GetCaster();
+                if (!caster || (caster->GetMap()->GetDifficulty() != RAID_DIFFICULTY_10MAN_HEROIC))
+                {
+                    return;
+                }
+                PreventDefaultAction();
+                int32 bp0 = 1109;
+                caster->CastCustomSpell(GetTarget(), SPELL_POISON_CLOUD_POISON_DAMAGE, &bp0, 0, 0, true);
+            }
+
+            void Register() override
+            {
+                OnEffectPeriodic += AuraEffectPeriodicFn(spell_grobbulus_poison_cloud_poison_40_AuraScript::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_grobbulus_poison_cloud_poison_40_AuraScript();
+        }
 };
 
 void AddSC_boss_grobbulus_40()
 {
     new boss_grobbulus_40();
     new boss_grobbulus_poison_cloud_40();
-    // RegisterSpellScript(spell_grobbulus_poison);
-    RegisterSpellScript(spell_grobbulus_mutating_injection_aura);
+    new spell_grobbulus_mutating_injection_40();
+//    new spell_grobbulus_poison();
+    new spell_grobbulus_poison_cloud_poison_40();
 }

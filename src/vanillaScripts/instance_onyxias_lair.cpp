@@ -134,7 +134,7 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
-        if (player->GetLevel() < 80)
+        if (player->getLevel() < 80)
         {
             player->SetRaidDifficulty(RAID_DIFFICULTY_10MAN_HEROIC);
         }
