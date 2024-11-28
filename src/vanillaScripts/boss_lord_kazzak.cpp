@@ -23,7 +23,7 @@
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-
+#include "SpellMgr.h"
 #include "ProgressionSystem.h"
 
 enum Texts
