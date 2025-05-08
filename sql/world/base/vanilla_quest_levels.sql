@@ -19,6 +19,9 @@ UPDATE quest_template SET RequiredItemId1 = 750 WHERE ID=33;
 /*  The Legend of Stalvan  */
 UPDATE quest_template SET QuestLevel = 35 WHERE ID=98;
 
+/* Shadow Magic */
+UPDATE quest_template SET QuestInfoID = 1, SuggestedGroupNum = 2 WHERE ID=115;
+
 /*  Howling in the Hills  */
 UPDATE quest_template SET QuestLevel = 25 WHERE ID=126;
 
@@ -479,6 +482,9 @@ UPDATE quest_template SET RequiredItemId1 = 16208, RequiredItemId2 = 0, Required
 
 /*  Earthen Arise  */
 UPDATE quest_template SET RequiredItemId2 = 0, RequiredItemCount2 = 0 WHERE ID=6481;
+
+/* An Unholy Alliance */
+UPDATE `quest_template` SET `LogDescription` = "Take the Small Scroll to Varimathras in the Undercity." WHERE `ID` = 6522;
 
 /*  King of the Foulweald  */
 UPDATE quest_template SET RequiredItemId2 = 0, RequiredItemCount2 = 0 WHERE ID=6621;
@@ -988,6 +994,11 @@ UPDATE `quest_template` SET `LogDescription` = "Kill Magistrate Burnside and 5 H
 UPDATE `quest_template` SET `LogDescription` = "Travel to Dun Garok and kill 10 Mountaineers, 4 Riflemen, 2 Priests and Captain Ironhill and report back to Darthalia in Tarren Mill." WHERE `ID` = 541;
 
 
+/* Battle of Hillsbrad */
+UPDATE `quest_template` SET `LogDescription` = "Take Darthalia's Sealed Commendation to Varimathras in the Undercity." WHERE `ID` = 550;
+UPDATE `quest_template` SET `QuestDescription` = "Because you fought with such valor and perseverance in the Battle of Hillsbrad, I have written this commendation, extolling your heroics in combat for the high command to recognize.$b$bTake this sealed commendation to Varimathras in the Undercity.  Go with pride, $c." WHERE `ID` = 550;
+    
+
 /*  The Broken Sigil  */
 UPDATE `quest_template` SET `LogDescription` = "Retrieve the 11 Sigil Fragments from the defenders in Stromgarde, and bring them to Tor'gan in Hammerfall." WHERE `ID` = 640;
 
@@ -1049,14 +1060,18 @@ UPDATE `quest_template` SET `LogDescription` = "Fel'zerul in Stonard wants you t
 UPDATE `quest_template` SET `LogDescription` = "Kill 12 Rattlecage Skeletons, and then return to Shadow Priest Sarvis in Deathknell when you are done." WHERE `ID` = 3901;
 
 
+/* What Is Going On? */
+UPDATE `quest_template` SET `QuestCompletionLog` = "Return to Thrall in Orgrimmar." WHERE `ID` = 4001;
+
+
 /*  Galgar's Cactus Apple Surprise  */
 UPDATE `quest_template` SET `LogDescription` = "Bring Galgar 10 Cactus Apples. You remember him saying that they could be found near cactuses." WHERE `ID` = 4402;
 UPDATE `quest_template` SET `QuestDescription` = "It sure gets hot out here in the Valley of Trials.$B$B<Galgar wipes his brow.>$B$BIf only I had some cactus apples, I could make my famous cactus apple surprise! Nothing cools you off faster than a piece of that delicious treat.$B$BI'll tell you what, $N. If you bring me 10 cactus apples, I'll make you a few portions of cactus apple surprise to take with you on your adventures. If you're interested, you can find cactus apples growing near the cactus plants around here." WHERE `ID` = 4402;
 
 
 /*  Beware of Pterrordax  */
-UPDATE `quest_template` SET `LogDescription` = "Kill 115 Frenzied Pterrordax, then speak to Spraggle Frock at Marshal's Refuge." WHERE `ID` = 4501;
-UPDATE `quest_template` SET `QuestDescription` = "Wanted: A skilled fighter to deal with the threat of the Pterrordax that inhabit the Un'Goro Crater. Their numbers are growing, and they are becoming a menace to travelers in the area.$B$BDecrease the population by slaying 115 frenzied pterrordax.$B$BSpeak with Spraggle Frock after completing the task for a reward." WHERE `ID` = 4501;
+UPDATE `quest_template` SET `LogDescription` = "Kill 10 Pterrordax and 15 Frenzied Pterrordax, then speak to Spraggle Frock at Marshal's Refuge." WHERE `ID` = 4501;
+UPDATE `quest_template` SET `QuestDescription` = "Wanted: A skilled fighter to deal with the threat of the Pterrordax that inhabit the Un'Goro Crater. Their numbers are growing, and they are becoming a menace to travelers in the area.$B$BDecrease the population by slaying 10 Pterrordax and 15 frenzied pterrordax.$B$BSpeak with Spraggle Frock after completing the task for a reward." WHERE `ID` = 4501;
 
 
 /*  A Matter of Time  */
@@ -1074,6 +1089,34 @@ UPDATE `quest_template` SET `QuestDescription` = "You have the look of a fisherm
 
 /*  Twisted Evils  */
 UPDATE `quest_template` SET `LogDescription` = "Collect 25 Theradric Crystal Carvings for Willow in Desolace." WHERE `ID` = 7028;
+
+
+/* Imperial Plate Belt */
+UPDATE `quest_request_items` SET `CompletionText` = "For the belt plans, I'll be needin' 20 thorium bars."   WHERE `ID` = 7653;
+
+
+/* Imperial Plate Boots */
+UPDATE `quest_request_items` SET `CompletionText` = "For the boot plans, I'll be needin' 40 thorium bars. Yep, 40. Are you gonna cry? Would you like a hanky?$B$B<Derotain laughs.>"   WHERE `ID` = 7654;
+
+
+/* Imperial Plate Bracer */
+UPDATE `quest_request_items` SET `CompletionText` = "For the bracer plans, I'll be needin' 20 thorium bars.$B$BAre you alright, sonny? Yer getting' all red."   WHERE `ID` = 7655;
+
+
+/* Imperial Plate Chest */
+UPDATE `quest_request_items` SET `CompletionText` = "For the chest piece plans, I'll be needin' 60 thorium bars.$B$BOh boy, there you go again. Are you gonna be runnin' to yer blue Gods, askin' why they have forsaken you?!? Toughen up, Nancy! Nobody ever said life's fair."   WHERE `ID` = 7656;
+
+
+/* Imperial Plate Helm */
+UPDATE `quest_request_items` SET `CompletionText` = "Just hand over 50 thorium bars and the helm plans are yers."   WHERE `ID` = 7657;
+
+
+/* Imperial Plate Leggings */
+UPDATE `quest_request_items` SET `CompletionText` = "Just hand over 60 thorium bars and the leg plans are yers.$B$BI know, I'm driving you into bankruptcy! I've heard it all before so you can save your sob story, weakling."   WHERE `ID` = 7658;
+
+
+/* Imperial Plate Shoulders */
+UPDATE `quest_request_items` SET `CompletionText` = "For the shoulder plans, I'll be needin' 20 thorium bars."   WHERE `ID` = 7659;
 
 
 /*  Snapjaws, Mon!  */
