@@ -4,7 +4,7 @@
 #include "GameObjectAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-
+#include "WorldSessionMgr.h"
 enum
 {
     QUEST_BANG_A_GONG = 8743,
@@ -163,7 +163,7 @@ public:
                 return;
 
             if (announce)
-                sWorld->SendZoneText(GLOBAL_TEXT_CHAMPION, player->GetName().c_str());
+                sWorldSessionMgr->SendZoneText(GLOBAL_TEXT_CHAMPION, player->GetName().c_str());
 
             eventTimer += 1000;
             eventStage = STAGE_OPEN_GATES;
