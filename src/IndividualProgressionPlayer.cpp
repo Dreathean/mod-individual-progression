@@ -31,11 +31,10 @@ public:
 
     void OnSetMaxLevel(Player* player, uint32& maxPlayerLevel) override
     {
-        if (!sIndividualProgression->enabled || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled)
         {
             return;
         }
-
         if (!sIndividualProgression->hasPassedProgression(player, PROGRESSION_NAXX40))
         {
             if (sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) > 60)
@@ -87,7 +86,7 @@ public:
     void OnAfterUpdateMaxHealth(Player* player, float& value) override
     {
         // TODO: This should be adjust to use an aura like damage adjustment. This is more robust to update when changing equipment, etc.
-        if (!sIndividualProgression->enabled || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled)
         {
             return;
         }
@@ -119,7 +118,7 @@ public:
 
     void OnQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue) override
     {
-        if (!sIndividualProgression->enabled || !sIndividualProgression->questXpFix || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled || !sIndividualProgression->questXpFix)
         {
             return;
         }
@@ -136,7 +135,7 @@ public:
 
     void OnGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 xpSource) override
     {
-        if (!sIndividualProgression->enabled || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled)
         {
             return;
         }
@@ -160,20 +159,9 @@ public:
         }
     }
 
-    bool isExcludedFromProgression(Player* player)
-    {
-        if(!sIndividualProgression->excludeAccounts) {
-            return false;
-        }
-        std::string accountName;
-        bool accountNameFound = AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
-        std::regex excludedAccountsRegex (sIndividualProgression->excludedAccountsRegex);
-        return (accountNameFound && std::regex_match(accountName, excludedAccountsRegex));
-    }
-
     bool OnBeforeTeleport(Player* player, uint32 mapid, float x, float y, float z, float /*orientation*/, uint32 /*options*/, Unit* /*target*/) override
     {
-        if (!sIndividualProgression->enabled || player->IsGameMaster() || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled || player->IsGameMaster())
         {
             return true;
         }
@@ -249,7 +237,7 @@ public:
 
     void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
     {
-        if (!sIndividualProgression->enabled || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled)
         {
             return;
         }
@@ -276,7 +264,7 @@ public:
 
     bool CanGroupInvite(Player* player, std::string& membername) override
     {
-        if (!sIndividualProgression->enabled || !sIndividualProgression->enforceGroupRules || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled || !sIndividualProgression->enforceGroupRules)
         {
             return true;
         }
@@ -288,7 +276,7 @@ public:
 
     bool CanGroupAccept(Player* player, Group* group) override
     {
-        if (!sIndividualProgression->enabled || !sIndividualProgression->enforceGroupRules || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled || !sIndividualProgression->enforceGroupRules)
         {
             return true;
         }
@@ -321,7 +309,7 @@ public:
 
     bool OnUpdateFishingSkill(Player* player, int32 /*skill*/, int32 /*zone_skill*/, int32 chance, int32 roll) override
     {
-        if (!sIndividualProgression->enabled || !sIndividualProgression->fishingFix || isExcludedFromProgression(player))
+        if (!sIndividualProgression->enabled || !sIndividualProgression->fishingFix)
             return true;
         if (chance < roll)
             return false;
@@ -368,12 +356,12 @@ public:
     }
 
     // Check if RDF is disabled in the context of Individual Progression
-    if (sConfigMgr->GetOption<bool>("IndividualProgression.DisableRDF", false))
-    {
-        ChatHandler(player->GetSession()).SendNotification("The Random Dungeon feature is currently disabled by the Individual Progression module.");
-        rDungeonId = 1000; // Set dungeon ID to an invalid value to cancel the queuing
-        return;
-    }
+    //if (sConfigMgr->GetOption<bool>("IndividualProgression.DisableRDF", false))
+    //{
+    //    player->GetSession()->SendNotification("The Random Dungeon feature is currently disabled by the Individual Progression module.");
+    //    rDungeonId = 1000; // Set dungeon ID to an invalid value to cancel the queuing
+    //    return;
+    //}
 
     if (!sIndividualProgression->hasPassedProgression(player, PROGRESSION_NAXX40))
     {
@@ -542,7 +530,7 @@ private:
 
     static void AdjustStats(Pet* pet, float computedAdjustment, float hpAdjustment)
     {
-        // int32 bp0 = 0; // This would be the damage taken adjustment value, but we are already adjusting health
+        int32 bp0 = 0; // This would be the damage taken adjustment value, but we are already adjusting health
         auto bp1 = static_cast<int32>(computedAdjustment);
         auto bp2 = static_cast<int32>(hpAdjustment);
 
@@ -624,7 +612,7 @@ public:
         }
     }
 
-    void ModifySpellDamageTaken(Unit* /*target*/, Unit* attacker, int32& damage, SpellInfo const* /*spellInfo*/) override
+    void ModifySpellDamageTaken(Unit* /*target*/, Unit* attacker, int32& damage, SpellInfo const* spellInfo) override
     {
         if (!sIndividualProgression->enabled || !attacker)
             return;

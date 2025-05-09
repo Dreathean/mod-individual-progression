@@ -22,7 +22,6 @@
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
-#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellMgr.h"
 #include "ProgressionSystem.h"
