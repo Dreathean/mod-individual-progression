@@ -1,6 +1,6 @@
-
 #include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "naxxramas.h"
@@ -207,6 +207,90 @@ class spell_kelthuzad_dark_blast_40 : public SpellScript
     }
 };
 
+// 28479 - Frostbolt
+class spell_kelthuzad_frostbolt_40 : public SpellScript
+{
+    PrepareSpellScript(spell_kelthuzad_frostbolt_40);
+
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || (caster->GetMap()->GetDifficulty() != RAID_DIFFICULTY_10MAN_HEROIC))
+        {
+            return;
+        }
+        SetEffectValue(urand(2550,3450));
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_kelthuzad_frostbolt_40::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+// 28522 - Icebolt
+class spell_sapphiron_icebolt_40 : public SpellScript
+{
+    PrepareSpellScript(spell_sapphiron_icebolt_40);
+
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || (caster->GetMap()->GetDifficulty() != RAID_DIFFICULTY_10MAN_HEROIC))
+        {
+            return;
+        }
+        SetEffectValue(urand(2625,3375));
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_sapphiron_icebolt_40::CalculateDamage, EFFECT_1, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+// 28531 - Frost Aura
+class spell_sapphiron_frost_aura_40 : public AuraScript
+{
+    PrepareAuraScript(spell_sapphiron_frost_aura_40);
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || (caster->GetMap()->GetDifficulty() != RAID_DIFFICULTY_10MAN_HEROIC))
+            return;
+        if (urand(0, 99) == 0) // 1% chance to receive extra Frost Aura tick
+            return;
+        amount *= 0.5; // Reduce damage by 50% (1200bp -> 600bp)
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_sapphiron_frost_aura_40::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+// 60960 - War Stomp - Patchwork Golem
+class spell_patchwork_golem_war_stomp_40 : public SpellScript
+{
+    PrepareSpellScript(spell_patchwork_golem_war_stomp_40);
+
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || (caster->GetMap()->GetDifficulty() != RAID_DIFFICULTY_10MAN_HEROIC))
+        {
+            return;
+        }
+        SetHitDamage(urand(936,1064));
+    }
+
+    void Register() override
+    {
+         OnEffectHitTarget += SpellEffectFn(spell_patchwork_golem_war_stomp_40::CalculateDamage, EFFECT_2, SPELL_EFFECT_WEAPON_DAMAGE);
+    }
+};
+
 // 29213 - Curse of the Plaguebringer
 enum CurseOfThePlaguebringer
 {
@@ -245,42 +329,28 @@ class spell_noth_curse_of_the_plaguebringer_aura_40 : public AuraScript
     }
 };
 
-//
+// 26046 - Razuvious - Mana Burn - Alternative for Disrupting Shout
 class spell_razuvious_disrupting_shout_40 : public SpellScript
 {
     PrepareSpellScript(spell_razuvious_disrupting_shout_40);
 
-    void PreventLaunchHit(SpellEffIndex effIndex)
+    void CalculateDamage(SpellEffIndex effIndex)
     {
         Unit* caster = GetCaster();
         if (!caster || (caster->GetMap()->GetDifficulty() != RAID_DIFFICULTY_10MAN_HEROIC))
         {
             return;
         }
-        if (Unit* target = GetHitUnit())
-        {
-            // ignore los -> not ignore los
-            // radius 60yd -> 45yd
-            PreventHitDefaultEffect(effIndex);
-            if (!target->IsWithinLOSInMap(caster) || !target->IsWithinDist2d(caster, 45.0f))
-            {
-                SetEffectValue(0);
-                return;
-            }
-            Powers PowerType = POWER_MANA;
-            // int32 amountToDrain = urand(4050,4950);
-            int32 amountToDrain = urand(500,501);
-            int32 drainedAmount = -target->ModifyPower(PowerType, -amountToDrain);
-            SetEffectValue(drainedAmount);
-        }
+        SetEffectValue(urand(4050,4950));
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_razuvious_disrupting_shout_40::PreventLaunchHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        OnEffectHitTarget += SpellEffectFn(spell_razuvious_disrupting_shout_40::CalculateDamage, EFFECT_0, SPELL_EFFECT_POWER_BURN);
     }
 };
 
+// 28450 Unholy Staff
 class spell_unholy_staff_arcane_explosion_40 : public SpellScript
 {
     PrepareSpellScript(spell_unholy_staff_arcane_explosion_40);
@@ -311,6 +381,7 @@ class spell_unholy_staff_arcane_explosion_40 : public SpellScript
     }
 };
 
+// 28153 Disease cloud, Sewage Slime
 class spell_disease_cloud_damage_40 : public SpellScript
 {
     PrepareSpellScript(spell_disease_cloud_damage_40);
@@ -331,6 +402,7 @@ class spell_disease_cloud_damage_40 : public SpellScript
     }
 };
 
+// 28135 Static Field
 class spell_feugen_static_field_40 : public SpellScript
 {
     PrepareSpellScript(spell_feugen_static_field_40);
@@ -365,6 +437,10 @@ void AddSC_custom_spells_40()
     RegisterSpellScript(spell_heigan_eruption_40);
     RegisterSpellScript(spell_submerge_visual_aura);
     RegisterSpellScript(spell_kelthuzad_dark_blast_40);
+    RegisterSpellScript(spell_kelthuzad_frostbolt_40);
+    RegisterSpellScript(spell_sapphiron_icebolt_40);
+    RegisterSpellScript(spell_sapphiron_frost_aura_40);
+    RegisterSpellScript(spell_patchwork_golem_war_stomp_40);
     RegisterSpellScript(spell_noth_curse_of_the_plaguebringer_aura_40);
     RegisterSpellScript(spell_razuvious_disrupting_shout_40);
     RegisterSpellScript(spell_unholy_staff_arcane_explosion_40);

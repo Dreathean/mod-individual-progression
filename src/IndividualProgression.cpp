@@ -45,11 +45,11 @@ void IndividualProgression::CheckAdjustments(Player* player) const
     {
         return;
     }
-    if (!hasPassedProgression(player, PROGRESSION_NAXX40))
+    if (!hasPassedProgression(player, PROGRESSION_NAXX40) || (!hasPassedProgression(player, PROGRESSION_NAXX40) && (player->GetLevel() <= IP_LEVEL_VANILLA)))
     {
         AdjustVanillaStats(player);
     }
-    else if (!hasPassedProgression(player, PROGRESSION_TBC_TIER_5))
+    else if (!hasPassedProgression(player, PROGRESSION_TBC_TIER_5) || (!hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (player->GetLevel() <= IP_LEVEL_TBC)))
     {
         AdjustTBCStats(player);
     }
@@ -57,15 +57,21 @@ void IndividualProgression::CheckAdjustments(Player* player) const
     {
         AdjustWotLKStats(player);
     }
-    
+    if (player->getClass() == CLASS_HUNTER)
+    {
+        // Remove the 15% built-in ranged haste that was added to hunters in WotLK
+        // This lets us add haste spells back to quivers
+        player->RemoveAura(RANGED_HASTE_SPELL);
+        player->CastSpell(player, RANGED_HASTE_SPELL, false);
+    }
 }
 
 void IndividualProgression::ApplyGearStatsTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const
 {
     if (item->Quality != ITEM_QUALITY_EPIC) // Non-endgame gear is okay
         return;
-    if ((hasPassedProgression(player, PROGRESSION_NAXX40) && (item->RequiredLevel <= 60)) ||
-        hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (item->RequiredLevel <=70))
+    if ((hasPassedProgression(player, PROGRESSION_NAXX40) && (item->RequiredLevel <= IP_LEVEL_VANILLA)) ||
+        (hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (item->RequiredLevel <= IP_LEVEL_TBC)))
     {
         computedAdjustment -= (100.0f * previousGearTuning);
     }
@@ -75,8 +81,8 @@ void IndividualProgression::ComputeGearTuning(Player* player, float& computedAdj
 {
     if (item->Quality != ITEM_QUALITY_EPIC) // Non-endgame gear is okay
         return;
-    if ((hasPassedProgression(player, PROGRESSION_NAXX40) && (item->RequiredLevel <= 60)) ||
-        hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (item->RequiredLevel <=70))
+    if ((hasPassedProgression(player, PROGRESSION_NAXX40) && (item->RequiredLevel <= IP_LEVEL_VANILLA)) ||
+        (hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (item->RequiredLevel <= IP_LEVEL_TBC)))
     {
         computedAdjustment += previousGearTuning;
     }
@@ -127,11 +133,11 @@ void IndividualProgression::AdjustWotLKStats(Player* player) const
     AdjustStats(player, computedAdjustment, computedAdjustment);
 }
 
-void IndividualProgression::AdjustStats(Player* player, float computedAdjustment, float computedHealingAdjustment)
+void IndividualProgression::AdjustStats(Player* player, float computedAdjustment, float /*computedHealingAdjustment*/)
 {
-    int32 bp0 = 0; // This would be the damage taken adjustment value, but we are already adjusting health
+    // int32 bp0 = 0; // This would be the damage taken adjustment value, but we are already adjusting health
     auto bp1 = static_cast<int32>(computedAdjustment);
-    auto bp1Healing = static_cast<int32>(computedHealingAdjustment);
+    // auto bp1Healing = static_cast<int32>(computedHealingAdjustment);
 
     player->RemoveAura(ABSORB_SPELL);
     player->CastCustomSpell(player, ABSORB_SPELL, &bp1, nullptr, nullptr, false);
@@ -228,14 +234,7 @@ void IndividualProgression::checkKillProgression(Player* killer, Creature* kille
                 UpdateProgressionState(killer, PROGRESSION_ONYXIA);
                 break;
             case NEFARIAN:
-                if (requirePreAQQuests)
-                {
-                    UpdateProgressionState(killer, PROGRESSION_BLACKWING_LAIR);
-                }
-                else
-                {
-                    UpdateProgressionState(killer, PROGRESSION_PRE_AQ);
-                }
+                UpdateProgressionState(killer, PROGRESSION_BLACKWING_LAIR);
                 break;
             case CTHUN:
                 UpdateProgressionState(killer, PROGRESSION_AQ);
@@ -292,7 +291,6 @@ private:
         sIndividualProgression->tbcHealthAdjustment = sConfigMgr->GetOption<float>("IndividualProgression.TBCHealthAdjustment", 1);
         sIndividualProgression->questXpFix = sConfigMgr->GetOption<bool>("IndividualProgression.QuestXPFix", true);
         sIndividualProgression->hunterPetLevelFix = sConfigMgr->GetOption<bool>("IndividualProgression.HunterPetLevelFix", true);
-        sIndividualProgression->requirePreAQQuests = sConfigMgr->GetOption<bool>("IndividualProgression.RequirePreAQQuests", true);
         sIndividualProgression->requireNaxxStrath = sConfigMgr->GetOption<bool>("IndividualProgression.RequireNaxxStrathEntrance", true);
         sIndividualProgression->enforceGroupRules = sConfigMgr->GetOption<bool>("IndividualProgression.EnforceGroupRules", true);
         sIndividualProgression->fishingFix = sConfigMgr->GetOption<bool>("IndividualProgression.FishingFix", true);
@@ -309,6 +307,9 @@ private:
         sIndividualProgression->LoadCustomProgressionEntries(sConfigMgr->GetOption<std::string>("IndividualProgression.CustomProgression", ""));
         sIndividualProgression->earlyDungeonSet2 = sConfigMgr->GetOption<bool>("IndividualProgression.AllowEarlyDungeonSet2", true);
         sIndividualProgression->pvpGearRequirements = sConfigMgr->GetOption<bool>("IndividualProgression.PvPGearRequirements", true);
+        sIndividualProgression->DisableRDF = sConfigMgr->GetOption<bool>("IndividualProgression.DisableRDF", false);
+        sIndividualProgression->excludeAccounts = sConfigMgr->GetOption<bool>("IndividualProgression.ExcludeAccounts", false);
+        sIndividualProgression->excludedAccountsRegex = sConfigMgr->GetOption<std::string>("IndividualProgression.ExcludedAccountsRegex", "");
     }
 
     static void LoadXpValues()
@@ -346,13 +347,17 @@ public:
         if (sIndividualProgression->simpleConfigOverride)
         {
             sWorld->setIntConfig(CONFIG_WATER_BREATH_TIMER, 60000);
-            sWorld->setIntConfig(CONFIG_LFG_OPTIONSMASK, 4);
             sWorld->setBoolConfig(CONFIG_OBJECT_QUEST_MARKERS, false);
             sWorld->setBoolConfig(CONFIG_OBJECT_SPARKLES, false);
             sWorld->setBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED, true);
             sWorld->setBoolConfig(CONFIG_LOW_LEVEL_REGEN_BOOST, false);
             sWorld->setBoolConfig(CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES, false);
         }
+
+        if (sIndividualProgression->DisableRDF)
+        {
+            sWorld->setIntConfig(CONFIG_LFG_OPTIONSMASK, 4);
+        }        
     }
 };
 
