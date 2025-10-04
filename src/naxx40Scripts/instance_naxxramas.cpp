@@ -24,6 +24,9 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "naxxramas.h"
+#include "ScriptMgr.h"
+#include "Map.h"
+#include "WorldSession.h"
 
 struct LivingPoisonData
 {
@@ -183,7 +186,8 @@ public:
         _events.Reset();
         _currentWingTaunt = SAY_FIRST_WING_TAUNT;
         _horsemanLoaded = 0;
-
+		_thaddiusScreams = false;
+        
         // Achievements
         _abominationsKilled = 0;
         _faerlinaAchievement = true;
@@ -257,8 +261,12 @@ public:
     void OnPlayerEnter(Player* player) override
     {
         InstanceScript::OnPlayerEnter(player);
+        if (_thaddiusScreams == false)
+		{
+            _events.ScheduleEvent(EVENT_THADDIUS_SCREAMS, 2min, 2min + 30s);
+		}
 
-        _events.ScheduleEvent(EVENT_THADDIUS_SCREAMS, 2min, 2min + 30s);
+        SetData(DATA_THADDIUS_SCREAMS, 0);
     }
 
     void OnCreatureCreate(Creature* creature) override
@@ -454,6 +462,9 @@ public:
             case DATA_ABOMINATION_KILLED:
                 ++_abominationsKilled;
                 return;
+			case DATA_THADDIUS_SCREAMS:
+			    _thaddiusScreams = true;
+			    return;
             case DATA_FRENZY_REMOVED:
                 _faerlinaAchievement = false;
                 return;
@@ -727,6 +738,7 @@ private:
     EventMap _events;
     uint8 _currentWingTaunt;
     uint8 _horsemanLoaded;
+	bool _thaddiusScreams;
 
     // GameObjects
     std::set<GameObject*> _heiganEruption[HeiganEruptSectionCount];
@@ -838,6 +850,47 @@ public:
     }
 };
 
+class OnyNaxxLogoutTeleport : public PlayerScript
+{
+public:
+    OnyNaxxLogoutTeleport() : PlayerScript("OnyNaxxLogoutTeleport") {}
+
+    void OnPlayerLogin(Player* player) override
+    {
+        TeleportIfNeeded(player);
+    }
+
+    void OnPlayerLogout(Player* player) override
+    {
+        TeleportIfNeeded(player);
+    }
+
+    void OnPlayerBeforeLogout(Player* player) override
+    {
+        TeleportIfNeeded(player);
+    }
+
+private:
+    void TeleportIfNeeded(Player* player)
+    {
+        int mapId = player->GetMapId();
+        if (player->GetRaidDifficulty() != RAID_DIFFICULTY_10MAN_HEROIC)
+            return;
+
+        switch (mapId)
+        {
+        case 533:
+            player->TeleportTo(0, 3082.641602f, -3725.781250f, 132.418884f, 0.002488f);
+            break;
+        case 249:
+            player->TeleportTo(1, -4737.995f, -3745.33f, 53.68f, 0.002488f);
+            break;
+        default:
+            break;
+        }
+    }
+};
+
 void AddSC_instance_naxxramas()
 {
     RegisterInstanceScript(instance_naxxramas, NaxxramasMapId);
@@ -845,4 +898,5 @@ void AddSC_instance_naxxramas()
     RegisterNaxxramasCreatureAI(npc_living_poison);
     RegisterNaxxramasCreatureAI(npc_naxxramas_trigger);
     new at_naxxramas_hub_portal();
+    new OnyNaxxLogoutTeleport();
 }

@@ -73,16 +73,7 @@ void IndividualProgression::CheckHPAdjustments(Player* player) const
         return;
     }
 
-    // Player is still in Vanilla content - give Vanilla health adjustment
-    if (!hasPassedProgression(player, PROGRESSION_PRE_TBC) || (!hasPassedProgression(player, PROGRESSION_PRE_TBC) && (player->GetLevel() <= IP_LEVEL_VANILLA)))
-    {
-        player->SetMaxHealth(player->GetMaxHealth() * vanillaHealthAdjustment);
-    }
-    // Player is in TBC content - give TBC health adjustment
-    else if (!hasPassedProgression(player, PROGRESSION_TBC_TIER_5) || (!hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (player->GetLevel() <= IP_LEVEL_TBC)))
-    {
-        player->SetMaxHealth(player->GetMaxHealth() * tbcHealthAdjustment);
-    }
+    player->SetMaxHealth(player->GetMaxHealth()); // just to trigger OnPlayerAfterUpdateMaxHealth
 }
 
 void IndividualProgression::ApplyGearStatsTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const
@@ -323,52 +314,96 @@ void IndividualProgression::checkKillProgression(Player* killer, Creature* kille
     {
         case RAGNAROS:
             UpdateProgressionState(killer, PROGRESSION_MOLTEN_CORE);
+            UpdateProgressionQuests(killer);
             break;
-        case ONYXIA:
+        case ONYXIA_40:
             UpdateProgressionState(killer, PROGRESSION_ONYXIA);
+            UpdateProgressionQuests(killer);
             break;
         case NEFARIAN:
             UpdateProgressionState(killer, PROGRESSION_BLACKWING_LAIR);
+            UpdateProgressionQuests(killer);
             break;
         case CTHUN:
             UpdateProgressionState(killer, PROGRESSION_AQ);
+            UpdateProgressionQuests(killer);
             break;
         case KELTHUZAD_40:
             UpdateProgressionState(killer, PROGRESSION_NAXX40);
+            UpdateProgressionQuests(killer);
             break;
         case MALCHEZAAR:
             UpdateProgressionState(killer, PROGRESSION_TBC_TIER_1);
+            UpdateProgressionQuests(killer);
             break;
         case KAELTHAS:
             UpdateProgressionState(killer, PROGRESSION_TBC_TIER_2);
+            UpdateProgressionQuests(killer);
             break;
         case ILLIDAN:
             UpdateProgressionState(killer, PROGRESSION_TBC_TIER_3);
+            UpdateProgressionQuests(killer);
             break;
         case ZULJIN:
             UpdateProgressionState(killer, PROGRESSION_TBC_TIER_4);
+            UpdateProgressionQuests(killer);
             break;
         case KILJAEDEN:
             UpdateProgressionState(killer, PROGRESSION_TBC_TIER_5);
+            UpdateProgressionQuests(killer);
             break;
         case KELTHUZAD:
             UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_1);
+            UpdateProgressionQuests(killer);
             break;
         case YOGGSARON:
             UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_2);
+            UpdateProgressionQuests(killer);
             break;
         case ANUBARAK:
             UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_3);
+            UpdateProgressionQuests(killer);
             break;
         case LICH_KING:
             UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_4);
+            UpdateProgressionQuests(killer);
             break;
         case HALION:
             UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_5);
+            UpdateProgressionQuests(killer);
             break;
     }
 }
 
+void IndividualProgression::UpdateProgressionQuests(Player* player)
+{
+	// remove all hidden progression quests
+    for (uint8 i = PROGRESSION_MOLTEN_CORE; i <= PROGRESSION_WOTLK_TIER_5; ++i)
+    {
+        uint32 PROGRESSION_QUEST = 66000;
+        PROGRESSION_QUEST = PROGRESSION_QUEST + i;
+		
+        if (player->GetQuestStatus(PROGRESSION_QUEST) == QUEST_STATUS_REWARDED)
+            player->RemoveRewardedQuest(PROGRESSION_QUEST);		
+    }
+
+    // add hidden progression quests
+    for (uint8 i = PROGRESSION_MOLTEN_CORE; i <= PROGRESSION_WOTLK_TIER_5; ++i)
+    {
+		ProgressionState PROGRESSION_STATE = static_cast<ProgressionState>(i);
+        uint32 PROGRESSION_QUEST = 66000;
+        PROGRESSION_QUEST = PROGRESSION_QUEST + i;
+		
+        if ((sIndividualProgression->hasPassedProgression(player, PROGRESSION_STATE)) && (player->GetQuestStatus(PROGRESSION_QUEST) != QUEST_STATUS_REWARDED))
+        {
+            Quest const* quest = sObjectMgr->GetQuestTemplate(PROGRESSION_QUEST);
+
+            player->AddQuest(quest, nullptr);
+            player->CompleteQuest(PROGRESSION_QUEST);
+            player->RewardQuest(quest, 0, player, false, false);
+        }
+    }
+}
 
 class IndividualPlayerProgression_WorldScript : public WorldScript
 {
@@ -384,7 +419,6 @@ private:
         sIndividualProgression->tbcHealingAdjustment = sConfigMgr->GetOption<float>("IndividualProgression.TBCHealingAdjustment", 1);
         sIndividualProgression->tbcHealthAdjustment = sConfigMgr->GetOption<float>("IndividualProgression.TBCHealthAdjustment", 1);
         sIndividualProgression->questXpFix = sConfigMgr->GetOption<bool>("IndividualProgression.QuestXPFix", true);
-        sIndividualProgression->hunterPetLevelFix = sConfigMgr->GetOption<bool>("IndividualProgression.HunterPetLevelFix", true);
         sIndividualProgression->requireNaxxStrath = sConfigMgr->GetOption<bool>("IndividualProgression.RequireNaxxStrathEntrance", false);
         sIndividualProgression->enforceGroupRules = sConfigMgr->GetOption<bool>("IndividualProgression.EnforceGroupRules", true);
         sIndividualProgression->fishingFix = sConfigMgr->GetOption<bool>("IndividualProgression.FishingFix", true);
@@ -394,12 +428,12 @@ private:
         sIndividualProgression->startingProgression = sConfigMgr->GetOption<uint8>("IndividualProgression.StartingProgression", 0);
         sIndividualProgression->questMoneyAtLevelCap = sConfigMgr->GetOption<bool>("IndividualProgression.QuestMoneyAtLevelCap", true);
         sIndividualProgression->repeatableVanillaQuestsXp = sConfigMgr->GetOption<bool>("IndividualProgression.RepeatableVanillaQuestsXP", true);
-        sIndividualProgression->disableDefaultProgression = sConfigMgr->GetOption<bool>("IndividualProgression.DisableDefaultProgression", false);
+        sIndividualProgression->disableDefaultProgression = sConfigMgr->GetOption<bool>("IndividualProgression.DisableDefaultProgression", true);
         sIndividualProgression->tbcRacesProgressionLevel = sConfigMgr->GetOption<uint8>("IndividualProgression.TbcRacesUnlockProgression", 0);
         sIndividualProgression->deathKnightProgressionLevel = sConfigMgr->GetOption<uint8>("IndividualProgression.DeathKnightUnlockProgression", 13);
         sIndividualProgression->deathKnightStartingProgression = sConfigMgr->GetOption<uint8>("IndividualProgression.DeathKnightStartingProgression", 13);
         sIndividualProgression->LoadCustomProgressionEntries(sConfigMgr->GetOption<std::string>("IndividualProgression.CustomProgression", ""));
-        sIndividualProgression->earlyDungeonSet2 = sConfigMgr->GetOption<bool>("IndividualProgression.AllowEarlyDungeonSet2", true);
+        sIndividualProgression->earlyDungeonSet2 = sConfigMgr->GetOption<bool>("IndividualProgression.AllowEarlyDungeonSet2", false);
         sIndividualProgression->pvpGearRequirements = sConfigMgr->GetOption<bool>("IndividualProgression.PvPGearRequirements", true);
         sIndividualProgression->DisableRDF = sConfigMgr->GetOption<bool>("IndividualProgression.DisableRDF", false);
         sIndividualProgression->excludeAccounts = sConfigMgr->GetOption<bool>("IndividualProgression.ExcludeAccounts", true);

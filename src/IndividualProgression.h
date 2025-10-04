@@ -32,6 +32,7 @@ enum ProgressionBossIDs
 {
     RAGNAROS             = 11502,
     ONYXIA               = 10184,
+    ONYXIA_40            = 301000,
     NEFARIAN             = 11583,
     CTHUN                = 15727,
     KELTHUZAD            = 15990,
@@ -55,7 +56,8 @@ enum BuffSpells
     SPELL_RUNE_TAP       = 48982,
     SPELL_LIFE_STEAL     = 20004,
     IPP_PHASE            = 89509,
-    IPP_PHASE_II         = 89511
+    IPP_PHASE_II         = 89511,
+    IPP_PHASE_III        = 89513
 };
 
 enum ProgressionQuestIDs
@@ -165,7 +167,12 @@ enum ProgressionAreas
 
 enum ProgressionSettings
 {
-    SETTING_PROGRESSION_STATE = 0
+    SETTING_PROGRESSION_STATE   = 0
+};
+
+enum DungeonKeys
+{
+    ITEM_DRAKEFIRE_AMULET       = 16309
 };
 
 enum ProgressionState : uint8         // Progression stands for what has been completed
@@ -261,6 +268,7 @@ public:
     void AdjustWotLKStats(Player* player) const;
     bool hasCustomProgressionValue(uint32 creatureEntry);
     void checkIPProgression(Player* player);	
+    void UpdateProgressionQuests(Player* player);
     void checkKillProgression(Player* player, Creature* killed);
     static void LoadCustomProgressionEntries(const std::string& customProgressionString);
     static void AdjustStats(Player* player, float computedAdjustment, float computedHealingAdjustment);

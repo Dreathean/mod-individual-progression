@@ -123,20 +123,10 @@ IndividualProgression.QuestXPFix = 1
 #
 IndividualProgression.PreviousGearTuning = 0
 
-# IndividualProgression.HunterPetLevelFix (this option is currently not implemented)
-#
-#        Description: In WotLK, a catch-up mechanism was added so that hunter pets are leveled up higher when tamed
-#                     Enable this option to restore Vanilla and TBC behavior and require more pet training
-#
-#        Default:     1 - Enabled
-#                     0 - Disabled
-#
-IndividualProgression.HunterPetLevelFix = 1
-
 # IndividualProgression.RequireNaxxStrathEntrance
 #
-#        Description: If enabled, requires players to first enter Naxx 40 through the original beta entrance in the back of Stratholme
-#                     before being able to use the teleportation crystal in EPL. This is consistent behavior with other Vanilla raids (MC, BL).
+#        Description: If enabled, this will require players to first enter Naxx 40 through the original beta entrance in the back of Stratholme,
+#                     before being able to use the teleportation crystal in EPL. This is consistent behavior with other Vanilla raids (MC, BWL).
 #                     If disabled, players can enter Naxx 40 through the crystal as soon as they are attuned and they have reached the correct
 #                     progression level - no Stratholme run will be required.
 #
@@ -271,8 +261,8 @@ IndividualProgression.TbcRacesUnlockProgression = 0
 # IndividualProgression.DeathKnightUnlockProgression
 #
 #        Description: The progression stage at which Death Knight characters can be created.
-#                     Death Knights will be available when the player reaches this levl with any character on the account.
-#                     Disable to Individual Progression not influence DK creation.
+#                     Death Knights will be available when the player reaches this level with any character on the account.
+#                     Disable to not let Individual Progression influence DK creation.
 #                     Please note that all other Death Knight creation restrictions from worldserver.conf still apply.
 #                     The default value is to not allow Death Knight creation until TBC content is cleared.
 #                     This is due to the game not having a proper progression balancing for Death Knights until WotLK,
@@ -324,7 +314,7 @@ IndividualProgression.CustomProgression = ""
 #        Default:     0 - Disabled
 #                     1 - Enabled
 #
-IndividualProgression.AllowEarlyDungeonSet2 = 1
+IndividualProgression.AllowEarlyDungeonSet2 = 0
 
 # IndividualProgression.PvPGearRequirements
 #
@@ -340,10 +330,10 @@ IndividualProgression.PvPGearRequirements = 1
 #        Description: Enable or disable the Random Dungeon Finder feature within the context of Individual Progression. 
 #                     Queuing for specific dungeons and Holiday Events will still be possible. (Use DungeonFinder.OptionsMask in worldserver.conf to completely disable the LFG tool.)
 #
-#        Default:     1 - RDF Disabled
-#                     0 - RDF Enabled
+#        Default:     0 - RDF Enabled
+#                     1 - RDF Disabled
 #
-IndividualProgression.DisableRDF = 1
+IndividualProgression.DisableRDF = 0
 
 # IndividualProgression.ExcludeAccounts
 #
@@ -361,6 +351,7 @@ IndividualProgression.ExcludeAccounts = 1
 #                     Only used if ExcludeAccounts is enabled.
 #                     This is useful for accounts that are used for bots, testing, or other purposes where progression should not be enforced.
 #                     If the Playerbots module is enabled, "^RNDBOT.*" will exclude randombots from Individual Progression.
+#                     To add more accounts you need to use capital letters and this format: "(^RNDBOT.*|TEST1|TEST2)"
 #
 #        Default:     "^RNDBOT.*"
 #
