@@ -32,7 +32,10 @@ public:
         {
             sIndividualProgression->UpdateProgressionState(player, static_cast<ProgressionState>(sIndividualProgression->startingProgression));
         }
+
         sIndividualProgression->CheckAdjustments(player);
+        sIndividualProgression->CheckHPAdjustments(player);
+        sIndividualProgression->checkIPProgression(player);
 
         if ((sIndividualProgression->hasPassedProgression(player, PROGRESSION_MOLTEN_CORE)) && (player->GetQuestStatus(PROGRESSION_FLAG_MC) != QUEST_STATUS_REWARDED))
         {
@@ -223,6 +226,7 @@ public:
     void OnPlayerMapChanged(Player* player) override
     {
         sIndividualProgression->CheckAdjustments(player);
+        sIndividualProgression->checkIPProgression(player);
     }
 
     void OnPlayerLevelChanged(Player* player, uint8 /*oldLevel*/) override
@@ -259,12 +263,14 @@ public:
         {
             return;
         }
+		
         float gearAdjustment = 0.0;
         for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
         {
             if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
                 sIndividualProgression->ComputeGearTuning(player, gearAdjustment, item->GetTemplate());
         }
+		
         // Player is still in Vanilla content - give Vanilla health adjustment
         if (!sIndividualProgression->hasPassedProgression(player, PROGRESSION_PRE_TBC) || (!sIndividualProgression->hasPassedProgression(player, PROGRESSION_PRE_TBC) && (player->GetLevel() <= IP_LEVEL_VANILLA)))
         {
@@ -502,24 +508,25 @@ public:
         return (currentState == otherPlayerState);
     }
 
-
-
     void OnPlayerCreatureKill(Player* killer, Creature* killed) override
     {
-        sIndividualProgression->checkKillProgression(killer, killed);
-        Group* group = killer->GetGroup();
-        if (!group)
+        if (killed->GetCreatureTemplate()->rank > CREATURE_ELITE_NORMAL)
         {
-            return;
-        }
-        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            Player* member = itr->GetSource();
-            if (!member)
-                continue;
+            sIndividualProgression->checkKillProgression(killer, killed);
+            Group* group = killer->GetGroup();
+            if (!group)
+            {
+                return;
+            }
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player* member = itr->GetSource();
+                if (!member)
+                    continue;
 
-            if (killer->IsAtLootRewardDistance(member))
-                sIndividualProgression->checkKillProgression(member, killed);
+                if (killer->IsAtLootRewardDistance(member))
+                    sIndividualProgression->checkKillProgression(member, killed);
+            }
         }
     }
 
@@ -956,6 +963,20 @@ public:
                     player->RemoveAura(IPP_PHASE_II);
                     player->CastSpell(player, IPP_PHASE, false);
                 }
+                break;
+            case AREA_PURGATION_ISLE:
+                if (sIndividualProgression->isBeforeProgression(player, PROGRESSION_AQ))
+                {
+                    player->RemoveAura(IPP_PHASE);
+                    player->RemoveAura(IPP_PHASE_II);
+                    player->CastSpell(player, IPP_PHASE, false);
+                }
+                else if (sIndividualProgression->hasPassedProgression(player, PROGRESSION_AQ)) 
+                {
+                    player->RemoveAura(IPP_PHASE);
+                    player->RemoveAura(IPP_PHASE_II);
+                    player->CastSpell(player, IPP_PHASE_II, false);
+                }					
                 break;
             case AREA_LIGHTS_HOPE:
             case AREA_ARGENT_TOURNAMENT_GROUNDS:

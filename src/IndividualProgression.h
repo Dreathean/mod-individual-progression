@@ -80,16 +80,33 @@ enum ProgressionQuests
     PROGRESSION_FLAG_AQ       = 66006,
     PROGRESSION_FLAG_NAXX40   = 66007,
     PROGRESSION_FLAG_PRE_TBC  = 66008,
-	PROGRESSION_FLAG_TBC_T1   = 66009,
-	PROGRESSION_FLAG_TBC_T2   = 66010,
-	PROGRESSION_FLAG_TBC_T3   = 66011,
-	PROGRESSION_FLAG_TBC_T4   = 66012,
-	PROGRESSION_FLAG_TBC_T5   = 66013,
-	PROGRESSION_FLAG_WOTLK_T1 = 66014,
-	PROGRESSION_FLAG_WOTLK_T2 = 66015,
-	PROGRESSION_FLAG_WOTLK_T3 = 66016,
-	PROGRESSION_FLAG_WOTLK_T4 = 66017,
-	PROGRESSION_FLAG_WOTLK_T5 = 66018
+    PROGRESSION_FLAG_TBC_T1   = 66009,
+    PROGRESSION_FLAG_TBC_T2   = 66010,
+    PROGRESSION_FLAG_TBC_T3   = 66011,
+    PROGRESSION_FLAG_TBC_T4   = 66012,
+    PROGRESSION_FLAG_TBC_T5   = 66013,
+    PROGRESSION_FLAG_WOTLK_T1 = 66014,
+    PROGRESSION_FLAG_WOTLK_T2 = 66015,
+    PROGRESSION_FLAG_WOTLK_T3 = 66016,
+    PROGRESSION_FLAG_WOTLK_T4 = 66017,
+    PROGRESSION_FLAG_WOTLK_T5 = 66018
+};
+
+enum ProgressionAchievements
+{
+    KEL_THUZAD_KILL      = 575, // WotLK, naxx40 does not have an achievement
+    ONYXIAS_KILL         = 684,
+    NEFARIAN_KILL        = 685,
+    RAGNAROS_KILL        = 686,
+    C_THUN_KILL          = 687,
+    MALCHEZAAR_KILL      = 690,
+    ZUL_JIN_KILL         = 691,
+    KAEL_THAS_KILL       = 696,
+    ILLIDAN_KILL         = 697,
+    KIL_JAEDEN_KILL      = 698,
+    ANUB_ARAK_KILL       = 3916,
+    LICH_KING_KILL       = 4597,
+    HALION_KILL          = 4815
 };
 
 enum ProgressionZones
@@ -115,6 +132,7 @@ enum ProgressionAreas
     AREA_GROVE_OF_THE_ANCIENTS           = 448,
     AREA_WILDBEND_RIVER                  = 454,
     AREA_TWILIGHT_GROVE                  = 856,
+    AREA_PURGATION_ISLE                  = 896,
     AREA_GADGETZAN                       = 976,
     AREA_DREAM_BOUGH                     = 1111,
     AREA_JADEMIR_LAKE                    = 1112,
@@ -235,12 +253,14 @@ public:
     void UpdateProgressionState(Player* player, ProgressionState newState) const;
     static void ForceUpdateProgressionState(Player* player, ProgressionState newState);
     void CheckAdjustments(Player* player) const;
+    void CheckHPAdjustments(Player* player) const;
     void ApplyGearStatsTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const;
     void ComputeGearTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const;
     void AdjustVanillaStats(Player* player) const;
     void AdjustTBCStats(Player* player) const;
     void AdjustWotLKStats(Player* player) const;
     bool hasCustomProgressionValue(uint32 creatureEntry);
+    void checkIPProgression(Player* player);	
     void checkKillProgression(Player* player, Creature* killed);
     static void LoadCustomProgressionEntries(const std::string& customProgressionString);
     static void AdjustStats(Player* player, float computedAdjustment, float computedHealingAdjustment);
