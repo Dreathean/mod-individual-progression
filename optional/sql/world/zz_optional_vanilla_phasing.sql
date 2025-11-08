@@ -41,6 +41,9 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_tbc' WHERE `entry` IN (
 21045, -- Landro Hired Bodyguard, Booty Bay
 22931, -- Gorrim, Emerald Sanctuary, Flight Master
 23131, -- Blood Knight Honor Guard, Orgrimmar
+23534, -- Babagaya Shadowcleft, Ratchet
+23535, -- Matero Zeshuwal, Ratchet
+23536, -- Nagulon, Ratchet
 24366, -- Nizzle, Rebel Camp, Flight Master
 24924, -- Sky-Captain Bomblast, Zep
 24926, -- Chief Officer Brassbolt, Zep
@@ -75,7 +78,7 @@ UPDATE `creature_template` SET `AIName` = '' WHERE `entry` IN (12807, 17109, 277
 
 /* Hide guild vaults until TBC (was introduced during 2.3) - disabled by default, because most players will expect these gobject to be there */
 /* UPDATE `gameobject` SET `ScriptName` = 'gobject_ipp_tbc' WHERE `guid` IN 
-(12496, 12497, 14641, 17352, 17353, 20621, 41911, 41912, 41913, 41914, 44709, 44710, 44711, 44713, 44714, 44715, 44716, 45029, 45030, 45069, 45132, 49095, 49821, 49822, 50356, 50357); */
+(12496, 12497, 14641, 17352, 17353, 20621, 41911, 41912, 41913, 41914, 44709, 44710, 44711, 44713, 44714, 44715, 44716, 45029, 45030, 45069, 45132, 49095, 49804, 49821, 49822, 50356, 50357); */
 
 /* 3.0+ - NPCs/Gobjects added in Eastern/Kalimdor during WotLK pre-patch or more */
 UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_wotlk' WHERE `entry` IN (
@@ -91,6 +94,97 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_wotlk' WHERE `entry` IN (
 31724, -- Crewman Paltertop, Zep
 31725  -- Sky-Captain LaFontaine, Zep
 );
+
+-- Hide Inscription vendors and trainers
+UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_wotlk' WHERE `entry` IN (
+30706, -- Jo'mah <Inscription Trainer>, Orgrimmar
+30709, -- Poshken Hardbinder <Inscription Trainer>, Thunder Bluff
+30710, -- Zantasia <Inscription Trainer>, Silvermoon
+30711, -- Margaux Parchley <Inscription Trainer>, Undercity
+30713, -- Catarina Stanford <Inscription Trainer>, Stormwind
+30715, -- Feyden Darkin <Inscription Trainer>, Darnassus
+30716, -- Thoth <Inscription Trainer>, Exodar
+30717, -- Elise Brightletter <Inscription Trainer>, Ironforge
+30723, -- Xantili <Inscription Supplies>, Orgrimmar
+30724, -- Mertle Murkpen <Inscription Supplies>, Thunder Bluff
+30727, -- Lelorian <Inscription Supplies>, Silvermoon
+30729, -- Ickabod Pimlen <Inscription Supplies>, Undercity
+30730, -- Stanly McCormick <Inscription Supplies>, Stormwind
+30731, -- Illianna Moonscribe <Inscription Supplies>, Darnassus
+30732, -- Sessoh <Inscription Supplies>, Exodar
+30733  -- Thargen Heavyquill <Inscription Supplies>, Ironforge
+);
+
+-- Hide Inscription gameobject - Lexicon of Power
+UPDATE `gameobject` SET `ScriptName` = 'gobject_ipp_wotlk' WHERE `guid` IN (
+61967, -- Stormwind
+63170, -- Orgrimmar
+63171, -- Thunder Bluff
+63172, -- Undercity
+63173, -- Silvermoon
+63174, -- Ironforge
+63175, -- Darnassus
+63176  -- Exodar
+);
+
+-- Hide Inscription option in city guard search menu
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `ConditionTypeOrReference` = 8 AND `SourceGroup` IN 
+(421, 751, 1942, 2168, 2351, 2847, 3284, 3330, 3355, 3532, 3558, 3572, 7667, 7788, 8138, 8205);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, 
+`ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES 
+--
+(15, 421,  8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Stormwind - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 751,  7, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Thunder Bluff - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 1942, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Orgrimmar - Hide inscription gossip menu option until player reaches WotLK'), 
+(15, 2168, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Ironforge - Hide inscription gossip menu option until player reaches WotLK'), 
+(15, 2351, 6, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Darnassus - Hide inscription gossip menu option until player reaches WotLK'), 
+(15, 2847, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Undercity - Hide inscription gossip menu option until player reaches WotLK'),
+--
+(15, 3284, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Razor Hill - Hide inscription gossip menu option until player reaches WotLK'), 
+(15, 3330, 7, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Bloodhoof Village - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 3355, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Brill - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 3532, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Elwynn Forest - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 3558, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Dun Morogh - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 3572, 6, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Teldrassil - Hide inscription gossip menu option until player reaches WotLK'),
+--
+(15, 7667, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Silvermoon - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 7788, 7, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Exodar - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 8138, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Azeremyst - Hide inscription gossip menu option until player reaches WotLK'),
+(15, 8205, 8, 0, 0, 8, 0, 66013, 0, 0, 0, 0, 0, '', 'Eversong Woods - Hide inscription gossip menu option until player reaches WotLK');
+
+-- Hide Jewelcrafting recipes on vanilla vendors
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 23 AND `SourceEntry` IN (20855, 20856, 20970, 20971, 20975, 21941, 21942, 21943, 21948, 21954, 21957);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, 
+`ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES 
+--
+(23, 3499,  20855, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Ranik - Design: Wicked Moonstone Ring'),
+(23, 3954,  20855, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Dalria - Design: Wicked Moonstone Ring'),
+(23, 1286,  20856, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Edna Mullby - Design: Heavy Golden Necklace of Battle'),
+(23, 3367,  20856, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Felika - Design: Heavy Golden Necklace of Battle'),
+(23, 1448,  20970, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Neal Allen - Design: Pendant of the Agate Shield'),
+(23, 4877,  20970, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Jandia - Design: Pendant of the Agate Shield'),
+(23, 2381,  20971, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Micha Yance - Design: Heavy Iron Knuckles'),
+(23, 2393,  20971, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Christoph Jeffcoat - Design: Heavy Iron Knuckles'),
+(23, 4775,  20975, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Burbik Gearspanner - Design: The Jade Eye'),
+(23, 5163,  20975, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Felika - Design: The Jade Eye'),
+(23, 989,   21941, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Banalash - Design: Black Pearl Panther'),
+(23, 4897,  21941, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Helenia Olden - Design: Black Pearl Panther'),
+(23, 2810,  21942, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Hammon Karwn - Design: Ruby Crown of Restoration'),
+(23, 2821,  21942, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Keena - Design: Ruby Crown of Restoration'),
+(23, 1148,  21943, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Nerrist - Design: Truesilver Crab'),
+(23, 4897,  21943, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Helenia Olden - Design: Truesilver Crab'),
+(23, 5163,  21948, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Burbik Gearspanner - Design: Wicked Moonstone Ring'),
+(23, 8363,  21948, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Shadi Mistrunner - Design: Wicked Moonstone Ring'),
+(23, 12941, 21954, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Jase Farlane - Design: Ring of Bitter Shadows'),
+(23, 11189, 21957, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Qia - Design: Necklace of the Diamond Tower');
+
+-- Hide TBC quests
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 19 AND `SourceEntry` IN (9189, 9425, 9601);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, 
+`ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES 
+(19, 0, 9189, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Hide \'Delivery to the Sepulcher\' until the player reaches TBC'),
+(19, 0, 9425, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Hide \'Report to Tarren Mill\' until the player reaches TBC'),
+(19, 0, 9601, 0, 0, 8, 0, 66008, 0, 0, 0, 0, 0, '', 'Hide \'To The Bulwark\' until the player reaches TBC');
 
 /* Hide mailboxes, see: https://www.wowhead.com/classic/object=32349/mailbox */
 UPDATE `gameobject` SET `ScriptName` = 'gobject_ipp_tbc' WHERE `guid` = 49832; -- Darnassus

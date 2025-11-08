@@ -607,10 +607,15 @@ public:
                     {
                         _events.RescheduleEvent(EVENT_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER, 15s);
 
-                        if (horsemanKilled != HorsemanCount)
-                            return false;
+                        if (horsemanKilled == 0)
+                        {
+                            ActivateWingPortal(DATA_HORSEMAN_PORTAL);
+                            break; 
+                        }
 
-                        // all horsemans are killed
+                        if (horsemanKilled != HorsemanCount)
+                            return false; 
+
                         if (Creature* cr = GetCreature(DATA_BARON_RIVENDARE_BOSS))
                             cr->CastSpell(cr, SPELL_THE_FOUR_HORSEMAN_CREDIT, true);
 
@@ -810,7 +815,7 @@ public:
                     if (Creature* cr = me->SummonCreature(NPC_LIVING_POISON, entry.Start, TEMPSUMMON_TIMED_DESPAWN, entry.DespawnTime))
                     {
                         cr->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
-                        cr->GetMotionMaster()->MovePoint(0, entry.End, false);
+                        cr->GetMotionMaster()->MovePoint(0, entry.End, FORCED_MOVEMENT_NONE, 0.f, false);
                     }
 
                 _events.Repeat(5s);

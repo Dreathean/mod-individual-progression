@@ -45,7 +45,10 @@ enum ProgressionBossIDs
     YOGGSARON            = 33288,
     ANUBARAK             = 34564,
     LICH_KING            = 36597,
-    HALION               = 39863
+    HALION               = 39863, 
+    RHAHK_ZOR            = 644,
+	SNEED                = 643,
+    GILNID               = 1763
 };
 
 enum BuffSpells
@@ -62,14 +65,15 @@ enum BuffSpells
 
 enum ProgressionQuestIDs
 {
-    QUEST_TROLL_NECKLACE  = 2881,
-    QUEST_MORROWGRAIN     = 3803,
-    QUEST_DEADWOOD        = 6221,
-    QUEST_WINTERFALL      = 6241,
-    MIGHT_OF_KALIMDOR     = 8742,
-    INTO_THE_BREACH       = 10259,
-    BANG_A_GONG           = 108743,
-    CHAOS_AND_DESTRUCTION = 108744
+    QUEST_TROLL_NECKLACE      = 2881,
+    QUEST_MORROWGRAIN         = 3803,
+    QUEST_DEADWOOD            = 6221,
+    QUEST_WINTERFALL          = 6241,
+    QUEST_THE_ANCIENT_LEAF    = 7632,
+    MIGHT_OF_KALIMDOR         = 8742,
+    INTO_THE_BREACH           = 10259,
+    BANG_A_GONG               = 108743,
+    CHAOS_AND_DESTRUCTION     = 108744
 };
 
 enum ProgressionQuests
@@ -96,7 +100,8 @@ enum ProgressionQuests
 
 enum ProgressionAchievements
 {
-    KEL_THUZAD_KILL      = 575, // WotLK, naxx40 does not have an achievement
+    KEL_THUZAD_40_KILL   = 533,
+    KEL_THUZAD_KILL      = 575, // WotLK
     ONYXIAS_KILL         = 684,
     NEFARIAN_KILL        = 685,
     RAGNAROS_KILL        = 686,
@@ -145,6 +150,7 @@ enum ProgressionAreas
     AREA_DREADMAUL_POST                  = 1439,
     AREA_SERPENTS_COIL                   = 1440,
     AREA_VALLEY_OF_HEROES                = 1611,
+    AREA_IRONTREE_WOOD                   = 1767,
     AREA_BROKEN_PILLAR                   = 1938,
     AREA_ABYSSAL_SANDS                   = 1939,
     AREA_TWILIGHT_VALE                   = 2077,
@@ -250,7 +256,7 @@ public:
 
     std::map<uint32, uint8> customProgressionMap;
     questXpMapType questXpMap;
-    float vanillaPowerAdjustment, vanillaHealthAdjustment, tbcPowerAdjustment, tbcHealthAdjustment, vanillaHealingAdjustment, tbcHealingAdjustment, previousGearTuning;
+    float vanillaPowerAdjustment, vanillaHealthAdjustment, tbcPowerAdjustment, tbcHealthAdjustment, vanillaHealingAdjustment, tbcHealingAdjustment;
     bool enabled, questXpFix, hunterPetLevelFix, enforceGroupRules, fishingFix, simpleConfigOverride, questMoneyAtLevelCap, repeatableVanillaQuestsXp, disableDefaultProgression, earlyDungeonSet2, requireNaxxStrath, pvpGearRequirements, DisableRDF, excludeAccounts;
     int progressionLimit, startingProgression, tbcRacesProgressionLevel, deathKnightProgressionLevel, deathKnightStartingProgression;
     std::string excludedAccountsRegex;
@@ -260,18 +266,20 @@ public:
     void UpdateProgressionState(Player* player, ProgressionState newState) const;
     static void ForceUpdateProgressionState(Player* player, ProgressionState newState);
     void CheckAdjustments(Player* player) const;
-    void CheckHPAdjustments(Player* player) const;
     void ApplyGearStatsTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const;
-    void ComputeGearTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const;
     void AdjustVanillaStats(Player* player) const;
     void AdjustTBCStats(Player* player) const;
     void AdjustWotLKStats(Player* player) const;
     bool hasCustomProgressionValue(uint32 creatureEntry);
+    bool isExcludedFromProgression(Player* player);
+    bool isAttuned(Player* player);
     void checkIPProgression(Player* player);	
     void UpdateProgressionQuests(Player* player);
+    void UpdateProgressionAchievements(Player* player, uint16 achievementID);
     void checkKillProgression(Player* player, Creature* killed);
     static void LoadCustomProgressionEntries(const std::string& customProgressionString);
-    static void AdjustStats(Player* player, float computedAdjustment, float computedHealingAdjustment);
+    static void RemovePlayerAchievement(uint16 playerGUID, uint16 achievementId);
+	static void AdjustStats(Player* player, float computedPowerAdjustment, float computedHealthAdjustment);
     static float ComputeVanillaAdjustment(uint8 playerLevel, float configAdjustmentValue);
     static uint8 GetAccountProgression(uint32 accountId);
 };

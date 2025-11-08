@@ -3,6 +3,7 @@
  */
 
 #include "IndividualProgression.h"
+#include "naxxramas_40.h"
 
 IndividualProgression* IndividualProgression::instance()
 {
@@ -14,7 +15,10 @@ IndividualProgression* IndividualProgression::instance()
 bool IndividualProgression::hasPassedProgression(Player* player, ProgressionState state) const
 {
     if (progressionLimit && state >= progressionLimit)
+	{
         return false;
+	}
+	
     return player->GetPlayerSetting("mod-individual-progression", SETTING_PROGRESSION_STATE).value >= state;
 }
 
@@ -26,7 +30,10 @@ bool IndividualProgression::isBeforeProgression(Player* player, ProgressionState
 void IndividualProgression::UpdateProgressionState(Player* player, ProgressionState newState) const
 {
     if (progressionLimit && newState > progressionLimit)
+	{
         return;
+	}
+	
     uint8 currentState = player->GetPlayerSetting("mod-individual-progression", SETTING_PROGRESSION_STATE).value;
     if (newState > currentState)
     {
@@ -42,115 +49,47 @@ void IndividualProgression::ForceUpdateProgressionState(Player* player, Progress
 void IndividualProgression::CheckAdjustments(Player* player) const
 {
     if (!enabled)
-    {
+	{
         return;
-    }
-    if (!hasPassedProgression(player, PROGRESSION_NAXX40) || (!hasPassedProgression(player, PROGRESSION_NAXX40) && (player->GetLevel() <= IP_LEVEL_VANILLA)))
+	}
+ 
+    if (!hasPassedProgression(player, PROGRESSION_PRE_TBC) || (!hasPassedProgression(player, PROGRESSION_PRE_TBC) && (player->GetLevel() <= IP_LEVEL_VANILLA)))
     {
-        AdjustVanillaStats(player);
+        float adjustmentApplyPercent = (player->GetLevel() - 10.0f) / 50.0f;
+
+        float PowerAdjustmentValue = -100.0f * (1.0f - vanillaPowerAdjustment);
+        float computedPowerAdjustment = player->GetLevel() > 10 ? (PowerAdjustmentValue * adjustmentApplyPercent) : 0;
+
+        float HealthAdjustmentAmount = -100.0f * (1.0f - vanillaHealthAdjustment);
+        float computedHealthAdjustment = player->GetLevel() > 10 ? (HealthAdjustmentAmount * adjustmentApplyPercent) : 0;
+
+	    AdjustStats(player, computedPowerAdjustment, computedHealthAdjustment);
     }
     else if (!hasPassedProgression(player, PROGRESSION_TBC_TIER_5) || (!hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (player->GetLevel() <= IP_LEVEL_TBC)))
     {
-        AdjustTBCStats(player);
+        float computedPowerAdjustment = -100.0f * (1.0f - tbcPowerAdjustment);
+
+	    AdjustStats(player, computedPowerAdjustment, tbcHealthAdjustment);
     }
-    else
-    {
-        AdjustWotLKStats(player);
-    }
+	
     if (player->getClass() == CLASS_HUNTER)
     {
-        // Remove the 15% built-in ranged haste that was added to hunters in WotLK
-        // This lets us add haste spells back to quivers
+        // Remove the 15% built-in ranged haste that was added to hunters in WotLK - This lets us add haste spells back to quivers
         player->RemoveAura(RANGED_HASTE_SPELL);
         player->CastSpell(player, RANGED_HASTE_SPELL, false);
     }	
 }
 
-void IndividualProgression::CheckHPAdjustments(Player* player) const
+void IndividualProgression::AdjustStats(Player* player, float computedPowerAdjustment, float computedHealthAdjustment)
 {
-    if (!enabled)
-    {
-        return;
-    }
-
-    player->SetMaxHealth(player->GetMaxHealth()); // just to trigger OnPlayerAfterUpdateMaxHealth
-}
-
-void IndividualProgression::ApplyGearStatsTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const
-{
-    if (item->Quality != ITEM_QUALITY_EPIC) // Non-endgame gear is okay
-        return;
-    if ((hasPassedProgression(player, PROGRESSION_NAXX40) && (item->RequiredLevel <= IP_LEVEL_VANILLA)) ||
-        (hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (item->RequiredLevel <= IP_LEVEL_TBC)))
-    {
-        computedAdjustment -= (100.0f * previousGearTuning);
-    }
-}
-
-void IndividualProgression::ComputeGearTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const
-{
-    if (item->Quality != ITEM_QUALITY_EPIC) // Non-endgame gear is okay
-        return;
-    if ((hasPassedProgression(player, PROGRESSION_NAXX40) && (item->RequiredLevel <= IP_LEVEL_VANILLA)) ||
-        (hasPassedProgression(player, PROGRESSION_TBC_TIER_5) && (item->RequiredLevel <= IP_LEVEL_TBC)))
-    {
-        computedAdjustment += previousGearTuning;
-    }
-}
-
-void IndividualProgression::AdjustVanillaStats(Player* player) const
-{
-    float adjustmentValue = -100.0f * (1.0f - vanillaPowerAdjustment);
-    float adjustmentApplyPercent = (player->GetLevel() - 10.0f) / 50.0f;
-    float computedAdjustment = player->GetLevel() > 10 ? (adjustmentValue * adjustmentApplyPercent) : 0;
-
-    float adjustmentHealingValue = -100.0f * (1.0f - vanillaHealingAdjustment);
-    float adjustmentHealingApplyPercent = (player->GetLevel() - 10.0f) / 50.0f;
-    float computedHealingAdjustment = player->GetLevel() > 10 ? (adjustmentHealingValue * adjustmentHealingApplyPercent) : 0;
-
-    AdjustStats(player, computedAdjustment, computedHealingAdjustment);
-}
-
-void IndividualProgression::AdjustTBCStats(Player* player) const
-{
-    float adjustmentValue = -100.0f * (1.0f - tbcPowerAdjustment);
-    float adjustmentApplyPercent = 1;
-    float computedAdjustment = player->GetLevel() > 10 ? (adjustmentValue * adjustmentApplyPercent) : 0;
-
-    float adjustmentHealingValue = -100.0f * (1.0f - tbcHealingAdjustment);
-    float adjustmentHealingApplyPercent = 1;
-    float computedHealingAdjustment = player->GetLevel() > 10 ? (adjustmentHealingValue * adjustmentHealingApplyPercent) : 0;
-
-    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-    {
-        if (Item *item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-        {
-            ApplyGearStatsTuning(player, computedAdjustment, item->GetTemplate());
-            ApplyGearStatsTuning(player, computedHealingAdjustment, item->GetTemplate());
-        }
-    }
-    AdjustStats(player, computedAdjustment, computedHealingAdjustment);
-}
-
-void IndividualProgression::AdjustWotLKStats(Player* player) const
-{
-    float computedAdjustment = 0;
-    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-    {
-        if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            ApplyGearStatsTuning(player, computedAdjustment, item->GetTemplate());
-    }
-    AdjustStats(player, computedAdjustment, computedAdjustment);
-}
-
-void IndividualProgression::AdjustStats(Player* player, float computedAdjustment, float /*computedHealingAdjustment*/)
-{
-    // int32 bp0 = 0; // This would be the damage taken adjustment value, but we are already adjusting health
-    auto bp1 = static_cast<int32>(computedAdjustment);
-    // auto bp1Healing = static_cast<int32>(computedHealingAdjustment);
+    auto bp1 = static_cast<int32>(computedPowerAdjustment);
+	auto bp2 = static_cast<int32>(computedHealthAdjustment);
 
     player->RemoveAura(ABSORB_SPELL);
     player->CastCustomSpell(player, ABSORB_SPELL, &bp1, nullptr, nullptr, false);
+	
+	player->RemoveAura(HP_AURA_SPELL);
+    player->CastCustomSpell(player, HP_AURA_SPELL, &bp2, nullptr, nullptr, false);
 }
 
 float IndividualProgression::ComputeVanillaAdjustment(uint8 playerLevel, float configAdjustmentValue)
@@ -170,8 +109,7 @@ uint8 IndividualProgression::GetAccountProgression(uint32 accountId)
     uint8 progressionLevel = 0;
     if (!sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
     {
-        // Prevent crash if player settings are not enabled
-        return 0;
+        return 0; // Prevent crash if player settings are not enabled
     }
     QueryResult result = CharacterDatabase.Query("SELECT `data` FROM `character_settings` WHERE `source` = 'mod-individual-progression' AND `guid` IN (SELECT `guid` FROM `characters` WHERE `account` = {});", accountId);
     if (result)
@@ -189,6 +127,14 @@ uint8 IndividualProgression::GetAccountProgression(uint32 accountId)
         } while (result->NextRow());
     }
     return progressionLevel;
+}
+
+void IndividualProgression::RemovePlayerAchievement(uint16 playerGUID, uint16 achievementId)
+{
+	if (playerGUID && achievementId)
+    {
+        CharacterDatabase.Query("DELETE FROM `character_achievement` WHERE `guid` = {} AND `achievement` = {}", playerGUID, achievementId);
+    }
 }
 
 void IndividualProgression::LoadCustomProgressionEntries(std::string const& customProgressionString)
@@ -217,6 +163,30 @@ bool IndividualProgression::hasCustomProgressionValue(uint32 creatureEntry)
     return (customProgressionMap.find(creatureEntry) != customProgressionMap.end());
 }
 
+bool IndividualProgression::isAttuned(Player* player)
+{
+    if ((player->GetQuestStatus(NAXX40_ATTUNEMENT_1) == QUEST_STATUS_REWARDED) || 
+        (player->GetQuestStatus(NAXX40_ATTUNEMENT_2) == QUEST_STATUS_REWARDED) ||
+        (player->GetQuestStatus(NAXX40_ATTUNEMENT_3) == QUEST_STATUS_REWARDED))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+bool IndividualProgression::isExcludedFromProgression(Player* player)
+{
+    if(!sIndividualProgression->excludeAccounts) {
+        return false;
+    }
+    std::string accountName;
+    bool accountNameFound = AccountMgr::GetName(player->GetSession()->GetAccountId(), accountName);
+    std::regex excludedAccountsRegex (sIndividualProgression->excludedAccountsRegex);
+    return (accountNameFound && std::regex_match(accountName, excludedAccountsRegex));
+}
 
 void IndividualProgression::checkIPProgression(Player* killer)
 {
@@ -225,69 +195,118 @@ void IndividualProgression::checkIPProgression(Player* killer)
         return;
     }
 
+    uint8 currentState = killer->GetPlayerSetting("mod-individual-progression", SETTING_PROGRESSION_STATE).value;
+
     if (killer->HasAchieved(HALION_KILL)) // 4815
     {
-        UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_5);
+        if (currentState < PROGRESSION_WOTLK_TIER_5)
+        {
+            UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_5);
+        }
         return;
     }
     else if (killer->HasAchieved(LICH_KING_KILL)) // 4597
     {
-        UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_4);
+        if (currentState < PROGRESSION_WOTLK_TIER_4)
+        {
+            UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_4);
+        }
         return;
     }
     else if (killer->HasAchieved(ANUB_ARAK_KILL)) // 3916
     {
-        UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_3);
+        if (currentState < PROGRESSION_WOTLK_TIER_3)
+        {
+            UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_3);
+        }
         return;
     }
     else if (killer->HasAchieved(KEL_THUZAD_KILL)) // 575
     {
-        UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_1);
+        if (currentState < PROGRESSION_WOTLK_TIER_1)
+        {
+            UpdateProgressionState(killer, PROGRESSION_WOTLK_TIER_1);
+        }
         return;
     }
     else if (killer->HasAchieved(KIL_JAEDEN_KILL)) // 698
     {
-        UpdateProgressionState(killer, PROGRESSION_TBC_TIER_5);
+        if (currentState < PROGRESSION_TBC_TIER_5)
+        {
+            UpdateProgressionState(killer, PROGRESSION_TBC_TIER_5);
+        }
         return;
     }
     else if (killer->HasAchieved(ZUL_JIN_KILL)) // 691
     {
-        UpdateProgressionState(killer, PROGRESSION_TBC_TIER_4);
+        if (currentState < PROGRESSION_TBC_TIER_4)
+        {
+            UpdateProgressionState(killer, PROGRESSION_TBC_TIER_4);
+        }
         return;
     }
     else if (killer->HasAchieved(ILLIDAN_KILL)) // 697
     {
-        UpdateProgressionState(killer, PROGRESSION_TBC_TIER_3);
+        if (currentState < PROGRESSION_TBC_TIER_3)
+        {
+            UpdateProgressionState(killer, PROGRESSION_TBC_TIER_3);
+        }
         return;
     }
     else if (killer->HasAchieved(KAEL_THAS_KILL)) // 696
     {
-        UpdateProgressionState(killer, PROGRESSION_TBC_TIER_2);
+        if (currentState < PROGRESSION_TBC_TIER_2)
+        {
+            UpdateProgressionState(killer, PROGRESSION_TBC_TIER_2);
+        }
         return;
     }
     else if (killer->HasAchieved(MALCHEZAAR_KILL)) //  690
     {
-        UpdateProgressionState(killer, PROGRESSION_TBC_TIER_1);
+        if (currentState < PROGRESSION_TBC_TIER_1)
+        {
+            UpdateProgressionState(killer, PROGRESSION_TBC_TIER_1);
+        }
         return;
     }
+    else if (killer->HasAchieved(KEL_THUZAD_40_KILL)) // 533
+    {
+        if (currentState < PROGRESSION_NAXX40)
+        {
+            UpdateProgressionState(killer, PROGRESSION_NAXX40);
+        }
+        return;
+    }    
     else if (killer->HasAchieved(C_THUN_KILL)) // 687
     {
-        UpdateProgressionState(killer, PROGRESSION_AQ);
+        if (currentState < PROGRESSION_AQ)
+        {
+            UpdateProgressionState(killer, PROGRESSION_AQ);
+        }
         return;
     }
     else if (killer->HasAchieved(NEFARIAN_KILL)) // 685
     {
-        UpdateProgressionState(killer, PROGRESSION_BLACKWING_LAIR);
+        if (currentState < PROGRESSION_BLACKWING_LAIR)
+        {
+            UpdateProgressionState(killer, PROGRESSION_BLACKWING_LAIR);
+        }
         return;
     }
     else if (killer->HasAchieved(ONYXIAS_KILL)) // 684
     {
-        UpdateProgressionState(killer, PROGRESSION_ONYXIA);
+        if (currentState < PROGRESSION_ONYXIA)
+        {
+            UpdateProgressionState(killer, PROGRESSION_ONYXIA);
+        }
         return;
     }
     else if (killer->HasAchieved(RAGNAROS_KILL)) // 686
     {
-        UpdateProgressionState(killer, PROGRESSION_MOLTEN_CORE);
+        if (currentState < PROGRESSION_MOLTEN_CORE)
+        {
+            UpdateProgressionState(killer, PROGRESSION_MOLTEN_CORE);
+        }
         return;
     }
 }
@@ -331,6 +350,7 @@ void IndividualProgression::checkKillProgression(Player* killer, Creature* kille
         case KELTHUZAD_40:
             UpdateProgressionState(killer, PROGRESSION_NAXX40);
             UpdateProgressionQuests(killer);
+            UpdateProgressionAchievements(killer, KEL_THUZAD_40_KILL);
             break;
         case MALCHEZAAR:
             UpdateProgressionState(killer, PROGRESSION_TBC_TIER_1);
@@ -405,6 +425,16 @@ void IndividualProgression::UpdateProgressionQuests(Player* player)
     }
 }
 
+void IndividualProgression::UpdateProgressionAchievements(Player* player, uint16 achievementID)
+{
+    AchievementEntry const* entry = sAchievementStore.LookupEntry(achievementID);
+    
+    if (entry)
+    {
+        player->CompletedAchievement(entry);
+    }
+}
+
 class IndividualPlayerProgression_WorldScript : public WorldScript
 {
 private:
@@ -423,7 +453,6 @@ private:
         sIndividualProgression->enforceGroupRules = sConfigMgr->GetOption<bool>("IndividualProgression.EnforceGroupRules", true);
         sIndividualProgression->fishingFix = sConfigMgr->GetOption<bool>("IndividualProgression.FishingFix", true);
         sIndividualProgression->simpleConfigOverride = sConfigMgr->GetOption<bool>("IndividualProgression.SimpleConfigOverride", true);
-        sIndividualProgression->previousGearTuning = sConfigMgr->GetOption<float>("IndividualProgression.PreviousGearTuning", 0);
         sIndividualProgression->progressionLimit = sConfigMgr->GetOption<uint8>("IndividualProgression.ProgressionLimit", 0);
         sIndividualProgression->startingProgression = sConfigMgr->GetOption<uint8>("IndividualProgression.StartingProgression", 0);
         sIndividualProgression->questMoneyAtLevelCap = sConfigMgr->GetOption<bool>("IndividualProgression.QuestMoneyAtLevelCap", true);

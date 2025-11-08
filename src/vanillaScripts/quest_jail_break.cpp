@@ -101,11 +101,9 @@ public:
             _instance = creature->GetInstanceScript();
         }
 
-        void SetGUID(ObjectGuid playerGUID, int32 /*id*/) override
+        void SetGUID(ObjectGuid const& playerGUID, int32 /*id*/) override
         {
             _playerGUID = playerGUID;
-            Start(true, false, playerGUID, 0, false, false);
-            me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
         }
 
         void UpdateAI(uint32 diff) override
@@ -157,7 +155,7 @@ public:
             {
                 case 1:
                     Talk(SAY_START_ESCORT);
-                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PC);
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                     break;
                 case 7:
                     me->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
@@ -204,7 +202,7 @@ public:
                     break;
                 case 22:
                     SetEscortPaused(true);
-                    _events.ScheduleEvent(EVENT_RESUME_ESCORT, 8000);
+                    _events.ScheduleEvent(EVENT_RESUME_ESCORT, 8s);
                     if (Player* player = ObjectAccessor::FindPlayer(_playerGUID))
                     {
                         me->GetMotionMaster()->Clear();
@@ -218,6 +216,7 @@ public:
                 case 23:
                     Talk(SAY_EQUIPMENT_4);
                     me->GetMotionMaster()->Clear();
+                    me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
                     if (Player* player = ObjectAccessor::FindPlayer(_playerGUID))
                         me->SetFacingToObject(player);
                     break;
@@ -393,6 +392,8 @@ public:
         if (quest->GetQuestId() == QUEST_JAIL_BREAK)
         {
             me->AI()->SetGUID(player->GetGUID());
+			me->SetWalk(true);	
+			CAST_AI(npc_marshal_windsor::npc_marshal_windsorAI, me->AI())->Start(false, player->GetGUID());
         }
         else
         {
@@ -458,7 +459,7 @@ public:
         {
             if (actionId == 0)
             {
-                Start(false, true, ObjectGuid::Empty, 0, false, false);
+                Start(false, ObjectGuid::Empty, nullptr, false, false, false);
             }
         }
     };
