@@ -27,41 +27,6 @@ public:
     }
 };
 
-class gobject_ipp_we : public GameObjectScript
-{
-public:
-    gobject_ipp_we() : GameObjectScript("gobject_ipp_we") { }
-
-    struct gobject_ipp_weAI: GameObjectAI
-    {
-        explicit gobject_ipp_weAI(GameObject* object) : GameObjectAI(object) { };
-
-        bool CanBeSeen(Player const* player) override
-        {
-            if (player->IsGameMaster() || !sIndividualProgression->enabled)
-            {
-                return true;
-            }
-            
-            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
-            
-            if (sIndividualProgression->hasPassedProgression(target, PROGRESSION_PRE_AQ))
-            {
-                return sIndividualProgression->isBeforeProgression(target, PROGRESSION_PRE_AQ);
-            }
-            else
-            {
-                return sIndividualProgression->hasPassedProgression(target, PROGRESSION_BLACKWING_LAIR);
-            }
-        }
-    };
-
-    GameObjectAI* GetAI(GameObject* object) const override
-    {
-        return new gobject_ipp_weAI(object);
-    }
-};
-
 class gobject_ipp_aqwar : public GameObjectScript
 {
 public:
@@ -73,7 +38,7 @@ public:
 
         bool CanBeSeen(Player const* player) override
         {
-            if (player->IsGameMaster() || !sIndividualProgression->enabled)
+            if (player->IsGameMaster())
             {
                 return true;
             }
@@ -210,6 +175,32 @@ public:
     }
 };
 
+class gobject_ipp_tbc_t4 : public GameObjectScript
+{
+public:
+    gobject_ipp_tbc_t4() : GameObjectScript("gobject_ipp_tbc_t4") { }
+
+    struct gobject_ipp_tbc_t4AI: GameObjectAI
+    {
+        explicit gobject_ipp_tbc_t4AI(GameObject* object) : GameObjectAI(object) { };
+
+        bool CanBeSeen(Player const* player) override
+        {
+            if (player->IsGameMaster() || !sIndividualProgression->enabled)
+            {
+                return true;
+            }
+            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
+            return sIndividualProgression->hasPassedProgression(target, PROGRESSION_TBC_TIER_4);
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* object) const override
+    {
+        return new gobject_ipp_tbc_t4AI(object);
+    }
+};
+
 class gobject_ipp_wotlk : public GameObjectScript
 {
 public:
@@ -233,6 +224,78 @@ public:
     GameObjectAI* GetAI(GameObject* object) const override
     {
         return new gobject_ipp_wotlkAI(object);
+    }
+};
+
+class gobject_ipp_pvp_closed : public GameObjectScript
+{
+public:
+    gobject_ipp_pvp_closed() : GameObjectScript("gobject_ipp_pvp_closed") { }
+
+    struct gobject_ipp_pvp_closedAI: GameObjectAI
+    {
+        explicit gobject_ipp_pvp_closedAI(GameObject* object) : GameObjectAI(object) { };
+
+        bool CanBeSeen(Player const* player) override
+        {
+            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
+			uint32 PVP_RANK6_QUEST = 66106;
+			
+            if (player->IsGameMaster() || !sIndividualProgression->enabled || sIndividualProgression->isExcludedFromProgression(target))
+            {
+                return false;
+            }
+			
+            if (target->GetQuestStatus(PVP_RANK6_QUEST) == QUEST_STATUS_REWARDED)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* object) const override
+    {
+        return new gobject_ipp_pvp_closedAI(object);
+    }
+};
+
+class gobject_ipp_pvp_open : public GameObjectScript
+{
+public:
+    gobject_ipp_pvp_open() : GameObjectScript("gobject_ipp_pvp_open") { }
+
+    struct gobject_ipp_pvp_openAI: GameObjectAI
+    {
+        explicit gobject_ipp_pvp_openAI(GameObject* object) : GameObjectAI(object) { };
+
+        bool CanBeSeen(Player const* player) override
+        {
+            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
+			uint32 PVP_RANK6_QUEST = 66106;
+			
+            if (player->IsGameMaster() || !sIndividualProgression->enabled || sIndividualProgression->isExcludedFromProgression(target))
+            {
+                return true;
+            }
+			
+            if (target->GetQuestStatus(PVP_RANK6_QUEST) == QUEST_STATUS_REWARDED)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+    };
+
+    GameObjectAI* GetAI(GameObject* object) const override
+    {
+        return new gobject_ipp_pvp_openAI(object);
     }
 };
 
@@ -675,100 +738,33 @@ public:
     }
 };
 
-class npc_training_dummy_ipp_wotlk : public CreatureScript
-{
-public:
-    npc_training_dummy_ipp_wotlk() : CreatureScript("npc_training_dummy_ipp_wotlk") { }
-
-    struct npc_training_dummy_ipp_wotlkAI : ScriptedAI
-    {
-        /*explicit*/ npc_training_dummy_ipp_wotlkAI(Creature* creature) : ScriptedAI(creature)
-        {
-            me->SetCombatMovement(false);
-            me->ApplySpellImmune(0, 0, 98, true); // ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true)
-        }
-
-        uint32 resetTimer;
-
-        void Reset() override
-        {
-            me->CastSpell(me, 61204, true); // CastSpell(me, SPELL_STUN_PERMANENT, true)
-            resetTimer = 5000;
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (!_EnterEvadeMode(why))
-                return;
-
-            Reset();
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            resetTimer = 5000;
-            damage = 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (resetTimer <= diff)
-            {
-                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-                resetTimer = 5000;
-            }
-            else
-                resetTimer -= diff;
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override { }
-
-        bool CanBeSeen(Player const* player) override
-        {
-            if (player->IsGameMaster() || !sIndividualProgression->enabled)
-            {
-                return true;
-            }
-            Player* target = ObjectAccessor::FindConnectedPlayer(player->GetGUID());
-            return sIndividualProgression->hasPassedProgression(target, PROGRESSION_TBC_TIER_5);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_training_dummy_ipp_wotlkAI(creature);
-    }
-};
-
 // Add all scripts in one
 void AddSC_mod_individual_progression_awareness()
 {
-    new gobject_ipp_preaq();   // wanted poster Cenarion Hold
-    new gobject_ipp_we();      // War Effort supplies in cities
-    new gobject_ipp_aqwar();   // AQ war crystals
-    new gobject_ipp_si();      // Scourge Invasion
+    new gobject_ipp_preaq();          // Wanted poster Cenarion Hold
+    new gobject_ipp_aqwar();          // AQ war crystals
+    new gobject_ipp_si();             // Scourge Invasion
     new gobject_ipp_naxx40();
-    new gobject_ipp_pre_tbc(); // stormwind pvp room
+    new gobject_ipp_pre_tbc();        // Stormwind pvp room
     new gobject_ipp_tbc();
+    new gobject_ipp_tbc_t4();         // Shattered Sun
     new gobject_ipp_wotlk();
-    new npc_ipp_preaq();       // Cenarion Hold NPCs
-    new npc_ipp_we();          // War Effort NPCs in cities
+    new gobject_ipp_pvp_closed();     // pvp officer doors
+    new gobject_ipp_pvp_open();       // pvp officer doors
+    new npc_ipp_preaq();              // Cenarion Hold NPCs
+    new npc_ipp_we();                 // War Effort NPCs in cities
 	new npc_ipp_aq();
-    new npc_ipp_si();          // Scourge Invasion
-    new npc_ipp_pre_naxx40();  // Scourge Invasion
+    new npc_ipp_si();                 // Scourge Invasion
+    new npc_ipp_pre_naxx40();         // Scourge Invasion
     new npc_ipp_naxx40();
-    new npc_ipp_pre_tbc();     // vanilla pvp vendors
+    new npc_ipp_pre_tbc();            // Vanilla pvp vendors
     new npc_ipp_tbc();
     new npc_ipp_tbc_pre_t4();
     new npc_ipp_tbc_t4();
-    new npc_ipp_tbc_t5();
+    // new npc_ipp_tbc_t5();
     new npc_ipp_wotlk();
     new npc_ipp_wotlk_ulduar();
     new npc_ipp_wotlk_totc();
     new npc_ipp_wotlk_icc();
     new npc_ipp_ds2();
-    // new npc_training_dummy_ipp_wotlk();
 }

@@ -1,10 +1,10 @@
 /* smart scripts */
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN 
-(8889, 8890, 8891, 8892, 8893, 8894, 8895, 8896, 8897, 8898, 8899, 8900, 8901, 8902, 8903, 8904, 8905, 8906, 8907, 8908, 8909, 8910, 8911, 8912, 8913, 
-8914, 8915, 8920, 8921, 8922, 8923, 9017, 9024, 9025, 9026, 9034, 9035, 9036, 9038, 9040, 9041, 9042, 9056, 9319, 9543, 9545, 9547, 9956, 10043);
+(8889, 8890, 8891, 8892, 8893, 8894, 8895, 8896, 8897, 8898, 8899, 8900, 8901, 8902, 8903, 8904, 8905, 8906, 8907, 8908, 8909, 8910, 8911, 8912, 8913, 8914, 8915, 8920, 8921, 8922, 8923, 
+9017, 9024, 9025, 9026, 9034, 9035, 9036, 9038, 9040, 9041, 9042, 9056, 9319, 9437, 9438, 9439, 9441, 9442, 9443, 9543, 9545, 9547, 9956, 10043);
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN 
-(8889, 8890, 8891, 8892, 8893, 8894, 8895, 8896, 8897, 8898, 8899, 8900, 8901, 8902, 8903, 8904, 8905, 8906, 8907, 8908, 8909, 8910, 8911, 8912, 8913, 
-8914, 8915, 8920, 8921, 8922, 8923, 9017, 9024, 9025, 9026, 9034, 9035, 9036, 9038, 9040, 9041, 9042, 9056, 9319, 9543, 9545, 9547, 9956, 10043);
+(8889, 8890, 8891, 8892, 8893, 8894, 8895, 8896, 8897, 8898, 8899, 8900, 8901, 8902, 8903, 8904, 8905, 8906, 8907, 8908, 8909, 8910, 8911, 8912, 8913, 8914, 8915, 8920, 8921, 8922, 8923, 
+9017, 9024, 9025, 9026, 9034, 9035, 9036, 9038, 9040, 9041, 9042, 9056, 9319, 9437, 9438, 9439, 9441, 9442, 9443, 9543, 9545, 9547, 9956, 10043);
 
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, 
 `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, 
@@ -243,6 +243,19 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (9319, 0, 2, 0, 0, 0, 100, 0, 4000, 12000, 4000, 12000, 0, 0, 11, 21049, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,     'Houndmaster Grebmar - In Combat - Cast Bloodlust'), -- https://www.youtube.com/watch?v=RdBpOWNqZeg
 (9319, 0, 3, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                      'Houndmaster Grebmar - Between 0-15% Health - Flee For Assist (No Repeat)'),
 --
+(9437, 0, 0, 0, 0, 0, 100, 0, 0, 0, 2000, 2000, 0, 0, 11, 15234, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Dark Keeper Vorfalk - In Combat - Cast Lightning Bolt'),
+(9437, 0, 1, 0, 0, 0, 100, 0, 6000, 9000, 7000, 10000, 0, 0, 11, 15306, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,      'Dark Keeper Vorfalk - In Combat - Cast Shock'),
+(9438, 0, 0, 0, 0, 0, 100, 0, 0, 0, 2000, 2000, 0, 0, 11, 15228, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Dark Keeper Bethek - In Combat - Cast Fireball'),
+(9438, 0, 1, 0, 0, 0, 100, 0, 3000, 5000, 15000, 20000, 0, 0, 11, 12738, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,     'Dark Keeper Bethek - In Combat - Cast Amplify Damage'),
+(9439, 0, 0, 0, 0, 0, 100, 0, 0, 0, 2000, 2000, 0, 0, 11, 15232, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Dark Keeper Uggel - In Combat - Cast Shadow Bolt'),
+(9439, 0, 1, 0, 0, 0, 100, 0, 5000, 7000, 12000, 18000, 0, 0, 11, 14875, 33, 0, 0, 0, 0, 5, 30, 0, 0, 0, 0, 0, 0, 0,   'Dark Keeper Uggel - In Combat - Cast Curse of Agony'),
+(9441, 0, 0, 0, 0, 0, 100, 0, 9000, 14000, 40000, 55000, 0, 0, 11, 17139, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,    'Dark Keeper Zimrel - In Combat - Cast Power Word: Shield'),
+(9441, 0, 1, 0, 0, 0, 100, 0, 0, 0, 2000, 2000, 0, 0, 11, 15238, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Dark Keeper Zimrel - In Combat - Cast Holy Smite'),
+(9442, 0, 0, 0, 0, 0, 100, 0, 0, 0, 2000, 2000, 0, 0, 11, 15230, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Dark Keeper Ofgut - In Combat - Cast Arcane Bolt'),
+(9442, 0, 1, 0, 0, 0, 100, 0, 7000, 12000, 18000, 24000, 0, 0, 11, 7121, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,     'Dark Keeper Ofgut - In Combat - Cast Anti-Magic Shield'),
+(9443, 0, 0, 0, 1, 0, 100, 0, 1000, 1000, 900000, 900000, 0, 0, 11, 12544, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,   'Dark Keeper Pelver - Out of Combat - Cast Frost Armor'),
+(9443, 0, 1, 0, 0, 0, 100, 0, 0, 0, 2000, 2000, 0, 0, 11, 12675, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Dark Keeper Pelver - In Combat - Cast Frostbolt'),
+--
 (9543, 0, 0, 1, 62, 0, 100, 512, 1970, 0, 0, 0, 0, 0, 2, 14, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                 'Ribbly Screwspigot - On Gossip Select - Set Faction'),
 (9543, 0, 1, 2, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 2, 14, 0, 0, 0, 0, 0, 11, 10043, 30, 0, 0, 0, 0, 0, 0,              'Ribbly Screwspigot - On Gossip Select - Set Faction'),
 (9543, 0, 2, 3, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                     'Ribbly Screwspigot - On Gossip Select - Talk'),
@@ -279,7 +292,35 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (10043, 0, 0, 0, 0, 0, 100, 0, 10000, 20000, 10000, 20000, 0, 0, 11, 15692, 0, 0, 0, 0, 0, 21, 5, 0, 0, 0, 0, 0, 0, 0, 'Ribbly\'s Crony - Within 0-5 Range - Cast Eviscerate'),
 (10043, 0, 1, 0, 0, 0, 100, 0, 5000, 7000, 6000, 9000, 0, 0, 11, 15581, 0, 0, 0, 0, 0, 21, 5, 0, 0, 0, 0, 0, 0, 0,     'Ribbly\'s Crony - Within 0-5 Range - Cast Sinister Strike');
 
-    
+-- fix bridge ambush
+DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (-91106, -91107, -608891);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, 
+`event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, 
+`action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, 
+`target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
+--
+(-91106, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Anvilrage Guardsman - On Respawn - Set Invisible'),
+(-91106, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Anvilrage Guardsman - On Respawn - Set Faction'),
+(-91106, 0, 0, 0, 60, 0, 100, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Anvilrage Guardsman - On Update - Set in Combat with Zone'),
+(-91107, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Anvilrage Guardsman - On Respawn - Set Invisible'),
+(-91107, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Anvilrage Guardsman - On Respawn - Set Faction'),
+(-91107, 0, 0, 0, 60, 0, 100, 0, 0, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Anvilrage Guardsman - On Update - Set in Combat with Zone'),
+--
+(-608891, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,        'BRD Bridge Trigger - On Respawn - Set Invisible'),
+(-608891, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 35, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,        'BRD Bridge Trigger - On Respawn - Set Faction'),
+(-608891, 0, 2, 3, 101, 0, 100, 0, 1, 10, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 10, 91106, 0, 0, 0, 0, 0, 0, 0, 'BRD Bridge Trigger - On Near Player - Set visible Anvilrage Guardsman 91106'),
+(-608891, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 21, 0, 0, 0, 0, 0, 10, 91106, 0, 0, 0, 0, 0, 0, 0,   'BRD Bridge Trigger - On Near Player - Set Faction Anvilrage Guardsman 91106'),
+(-608891, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 10, 91107, 0, 0, 0, 0, 0, 0, 0,   'BRD Bridge Trigger - On Near Player - Set visible Anvilrage Guardsman 91107'),
+(-608891, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 21, 0, 0, 0, 0, 0, 10, 91107, 0, 0, 0, 0, 0, 0, 0,   'BRD Bridge Trigger - On Near Player - Set Faction Anvilrage Guardsman 91107');
+
+DELETE FROM `creature` WHERE `guid` IN (91106, 91107, 608891);
+INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, 
+`wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES 
+--
+(91106,  8891, 0, 0, 230, 0, 0, 1, 1, 1, 642.366, -274.516, -43.1092, 0.471239, 7200, 0, 0, 6645, 0, 0, 0, 0, 0, '', 0, 0, NULL),
+(91107,  8891, 0, 0, 230, 0, 0, 1, 1, 1, 740.114, -283.345, -42.7508, 2.86234, 7200, 0, 0, 6645, 0, 0, 0, 0, 0, '', 0, 0, NULL),
+(608891, 8891, 0, 0, 230, 0, 0, 1, 1, 1, 686.649, -280.075, -43.1966, 0.0844455, 300, 0, 0, 6876, 0, 0, 0, 0, 0, '', 0, 0, NULL);
+
 UPDATE `creature` SET `MovementType` = 2, `currentwaypoint` = 1 WHERE `guid` = 47738; -- Fireguard Destroyer(8911)
 UPDATE `creature` SET `MovementType` = 2, `currentwaypoint` = 1 WHERE `guid` = 90828; -- Blazing Fireguard(8910)
 
@@ -946,11 +987,14 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 -- Shadowforge Torch drop rate
 UPDATE `creature_loot_template` SET `Chance` = 80 WHERE `Entry` = 9956 AND `Item` = 11885;
 
---  Rockfist was removed from Phalanx's drop table in TBC - placing it back
+-- Rockfist was removed from Phalanx's drop table in TBC - placing it back
 DELETE FROM `creature_loot_template` WHERE `Entry` = 9502 AND `Item` = 11743;
 INSERT INTO `creature_loot_template` (Entry, Item, Reference, Chance, QuestRequired, LootMode, GroupId, MinCount, MaxCount, Comment) VALUES
 (9502, 11743, 0, 0, 0, 1, 1, 1, 1, 'Phalanx - Rockfist');
 
+-- fix Dark Keeper portrait event
+UPDATE `gameobject_template` SET `ScriptName` = 'gobject_dark_keeper_portrait' WHERE `entry` = 164819;
+DELETE FROM `gameobject` WHERE `guid` = 43131;
 
 /*  Fix Dark Coffer event */
 SET @GUID         := 640001;

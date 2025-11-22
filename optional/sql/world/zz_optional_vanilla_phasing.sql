@@ -73,6 +73,11 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_tbc' WHERE `entry` IN (
 37915  -- Timothy Cunningham, The Bulwark, Flight Master
 );
 
+SET @IPPPHASE     := 65536;
+
+-- Forest Song - Ashenvale - Draenei camp
+UPDATE `creature` SET `phaseMask` = @IPPPHASE WHERE `id1` IN (17291, 17303, 17406, 17409, 17412, 17541, 22935, 22936);
+
 /* Remove interactions between Cersei, Lorrin and the orcs in Stonard */
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` IN (12807, 17109, 27705);
 
@@ -197,7 +202,7 @@ UPDATE `gameobject` SET `ScriptName` = 'gobject_ipp_wotlk' WHERE `guid` IN (
 
 /* Hide Rogg and his anvil + forge at the entrance of Orgrimmar until WotLK */
 UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_wotlk' WHERE `entry` = 37072;
-UPDATE `gameobject` SET `ScriptName` = 'gobject_ipp_wotlk' WHERE `guid` IN (347, 387);
+UPDATE `gameobject` SET `ScriptName` = 'gobject_ipp_wotlk' WHERE `guid` IN (347, 387); -- this needs a fix still, Rogg is currently aggressive while hidden. 
 
 /* Landro for TCG promotion in Booty Bay */
 UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_aq' WHERE `entry` = 17249;
@@ -205,6 +210,3 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_ipp_aq' WHERE `entry` = 17249
 /* Hide barber in Kalimdor/Eastern Kingdom/Outland until WotLK - disabled by default, because most players will expect barbers to be there */
 /* UPDATE `creature` SET `ScriptName` = 'npc_ipp_wotlk' WHERE `map` IN (0, 1, 530) AND `id1` IN (29139, 29141, 29142, 29143, 29145);
 UPDATE `gameobject` SET `ScriptName` = 'gobject_ipp_wotlk' WHERE `map` IN (0, 1, 530) AND `id` IN (190683, 190684, 190697, 190698, 190699, 190704, 190710, 190711, 190712, 191028, 191029, 191030); */
-
-/* Hide training dummy in Kalimdor/Eastern Kingdom/Outland until WotLK - disabled by default, because most players will expect dummies to be there */
-/* UPDATE `creature` SET `ScriptName` = 'npc_training_dummy_ipp_wotlk' WHERE `map` IN (0, 1, 530) AND `id1` IN (31144, 31146, 32666, 32667); */
