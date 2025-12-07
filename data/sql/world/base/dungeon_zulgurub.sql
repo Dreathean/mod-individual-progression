@@ -31,7 +31,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (11350, 0, 4, 5, 2, 0, 100, 1, 0, 25, 0, 0, 0, 0, 11, 8269, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                   'Gurubashi Axe Thrower - Between 0-25% Health - Cast Frenzy (No Repeat)'),
 (11350, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                       'Gurubashi Axe Thrower - On Frenzy - Say Line 0'),
 (11350, 0, 6, 0, 106, 0, 100, 0, 0, 0, 15000, 18000, 0, 8, 11, 24018, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,         'Gurubashi Axe Thrower - Within 0-8 Range - Cast Axe Flurry'),
-(11350, 0, 7, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0,                         'Gurubashi Axe Thrower - On Aggro - Say Line 1'),
+(11350, 0, 7, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 21, 40, 0, 0, 0, 0, 0, 0, 0,                       'Gurubashi Axe Thrower - On Aggro - Say Line 1'),
 (11351, 0, 0, 0, 9, 0, 100, 0, 0, 0, 4000, 4000, 30, 60, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,               'Gurubashi Headhunter - Outside 30 Range - Start Combat Movement'),
 (11351, 0, 1, 0, 9, 0, 100, 0, 0, 0, 4000, 4000, 5, 30, 21, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                'Gurubashi Headhunter - Within 5-30 Range - Stop Combat Movement'),
 (11351, 0, 2, 0, 9, 0, 100, 0, 0, 0, 4000, 4000, 0, 5, 21, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                 'Gurubashi Headhunter - Within 0-5 Range - Start Combat Movement'),
@@ -55,7 +55,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 --
 (11357, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 12787, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                  'Son of Hakkar - On Respawn - Cast Thrash Proc'),
 (11357, 0, 1, 0, 0, 0, 100, 0, 4000, 10000, 4000, 10000, 0, 0, 11, 16790, 1, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,     'Son of Hakkar - In Combat - Cast Knockdown'),
-(11357, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 24320, 2, 7, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                   'Son of Hakkar - On Just Died - Cast Poisonous Blood'), -- doesn't work!
+(11357, 0, 2, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 14989, 3, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,               'Son of Hakkar - On Just Died - Summon Poisonous Cloud'),
 (11359, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 8876, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                   'Soulflayer - On Respawn - Cast Thrash Proc'),
 (11359, 0, 1, 0, 0, 0, 100, 0, 7000, 7000, 7000, 8000, 0, 0, 11, 22678, 0, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 0, 0,      'Soulflayer - Within 0-10 Range - Cast Fear'),
 (11359, 0, 2, 0, 0, 0, 100, 0, 0, 0, 2000, 3000, 0, 0, 11, 24619, 256, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,           'Soulflayer - In Combat - Cast Soul Tap'),

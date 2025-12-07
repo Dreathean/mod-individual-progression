@@ -109,7 +109,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 --
 (3276, 0, 0, 0, 0, 0, 100, 0, 4000, 9000, 18000, 25000, 0, 0, 11, 7098, 96, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,     'Witchwing Harpy - In Combat - Cast Curse of Mending'),
 (3276, 0, 1, 0, 2, 0, 100, 1, 0, 15, 0, 0, 0, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,                      'Witchwing Harpy - Between 0-15% Health - Flee For Assist (No Repeat)'),
-(3277, 0, 0, 0, 4, 0, 75, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0,                         'Witchwing Roguefeather - On Aggro - Say Line 0'),
+(3277, 0, 0, 0, 4, 0, 75, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 21, 40, 0, 0, 0, 0, 0, 0, 0,                       'Witchwing Roguefeather - On Aggro - Say Line 0'),
 (3277, 0, 1, 0, 0, 0, 100, 0, 4000, 8000, 12000, 16000, 0, 0, 11, 7992, 96, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,     'Witchwing Roguefeather - In Combat - Cast Slowing Poison'),
 (3277, 0, 2, 0, 67, 0, 100, 0, 0, 0, 9000, 12000, 0, 5, 11, 6595, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0,            'Witchwing Roguefeather - Behind Target - Cast Exploit Weakness'),
 (3278, 0, 0, 0, 4, 0, 20, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0,                         'Witchwing Slayer - On Aggro - Say Line 0'),
@@ -325,11 +325,6 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15, 2783, 0, 7, 164, 50, 'Show menu if blacksmithing is 50 or higher'),  -- Traugh <Expert Blacksmith>
 (15, 4206, 0, 7, 165, 50, 'Show menu if leatherworking is 50 or higher'), -- Krulmoo Fullmoon <Expert Leatherworker>
 (15, 4350, 0, 7, 197, 50, 'Show menu if tailoring is 50 or higher');      -- Mahani <Expert Tailor>
-
-
--- Vile Familiars (Warlock)
-DELETE FROM `creature_questender` WHERE `id` = 5765 AND `quest` = 1485;
-INSERT INTO `creature_questender` (`id`, `quest`) VALUES (5765, 1485);
 
 
 UPDATE `creature_template` SET `subname` = 'Blacksmithing Supplier'   WHERE `entry` = 3477;-- Hraq <Blacksmithing Supplier>

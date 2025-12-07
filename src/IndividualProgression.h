@@ -45,7 +45,7 @@ enum ProgressionBossIDs
     YOGGSARON            = 33288,
     ANUBARAK             = 34564,
     LICH_KING            = 36597,
-    HALION               = 39863, 
+    HALION               = 39863,
     RHAHK_ZOR            = 644,
     SNEED                = 643,
     GILNID               = 1763
@@ -58,6 +58,7 @@ enum BuffSpells
     RANGED_HASTE_SPELL   = 89507,
     SPELL_RUNE_TAP       = 48982,
     SPELL_LIFE_STEAL     = 20004,
+    SPELL_CANNIBALISE    = 20578,
     IPP_PHASE            = 89509,
     IPP_PHASE_II         = 89511,
     IPP_PHASE_III        = 89513
@@ -179,6 +180,8 @@ enum ProgressionAreas
     AREA_DRACO_DAR                       = 2421,
     AREA_RISE_OF_THE_DEFILER             = 2517,
     AREA_PESTILENT_SCAR                  = 2622,
+    AREA_SCARAB_WALL                     = 2737,
+    AREA_SCARAB_DAIS                     = 2741,
     AREA_HIVE_ASHI                       = 2742,
     AREA_HIVE_ZORA                       = 2743,
     AREA_HIVE_REGAL                      = 2744,
@@ -202,7 +205,7 @@ enum ProgressionState : uint8         // Progression stands for what has been co
 {
     PROGRESSION_START           = 0,
     PROGRESSION_MOLTEN_CORE     = 1,  // BWL available
-    PROGRESSION_ONYXIA          = 2, 
+    PROGRESSION_ONYXIA          = 2,
     PROGRESSION_BLACKWING_LAIR  = 3,  // ZG, AQ War effort, AQ quest line
     PROGRESSION_PRE_AQ          = 4,  // AQ gates open, raids available, AQ outdoors war 
     PROGRESSION_AQ_WAR          = 5,  // AQ gates open, raids, Field Duty quests and all Cenarion Hold npcs available
@@ -218,7 +221,7 @@ enum ProgressionState : uint8         // Progression stands for what has been co
     PROGRESSION_WOTLK_TIER_2    = 15, // TotC
     PROGRESSION_WOTLK_TIER_3    = 16, // ICC
     PROGRESSION_WOTLK_TIER_4    = 17, // Ruby Sanctum
-    PROGRESSION_WOTLK_TIER_5    = 18 
+    PROGRESSION_WOTLK_TIER_5    = 18
 };
 
 enum RandomDungeonIds : uint16
@@ -379,8 +382,8 @@ public:
     std::map<uint32, uint8> customProgressionMap;
     questXpMapType questXpMap;
     float vanillaPowerAdjustment, vanillaHealthAdjustment, tbcPowerAdjustment, tbcHealthAdjustment, vanillaHealingAdjustment, tbcHealingAdjustment;
-    bool enabled, questXpFix, hunterPetLevelFix, enforceGroupRules, fishingFix, simpleConfigOverride, questMoneyAtLevelCap, repeatableVanillaQuestsXp, disableDefaultProgression, earlyDungeonSet2, requireNaxxStrath, DisableRDF, excludeAccounts, VanillaPvpTitlesKeepPostVanilla, VanillaPvpTitlesEarnPostVanilla;
-    int progressionLimit, startingProgression, tbcRacesProgressionLevel, deathKnightProgressionLevel, deathKnightStartingProgression;
+    bool enabled, questXpFix, enforceGroupRules, fishingFix, simpleConfigOverride, questMoneyAtLevelCap, repeatableVanillaQuestsXp, disableDefaultProgression, earlyDungeonSet2, requireNaxxStrath, DisableRDF, excludeAccounts, VanillaPvpTitlesKeepPostVanilla, VanillaPvpTitlesEarnPostVanilla, ExcludedAccountsEarnPvPTitles;
+    int progressionLimit, startingProgression, tbcRacesProgressionLevel, deathKnightProgressionLevel, deathKnightStartingProgression, RequiredZulGurubProgression;
     uint32 VanillaPvpKillRank1, VanillaPvpKillRank2, VanillaPvpKillRank3, VanillaPvpKillRank4, VanillaPvpKillRank5, VanillaPvpKillRank6, VanillaPvpKillRank7, VanillaPvpKillRank8, VanillaPvpKillRank9, VanillaPvpKillRank10, VanillaPvpKillRank11, VanillaPvpKillRank12, VanillaPvpKillRank13, VanillaPvpKillRank14;
     std::string excludedAccountsRegex;
 
@@ -389,13 +392,14 @@ public:
     void UpdateProgressionState(Player* player, ProgressionState newState) const;
     static void ForceUpdateProgressionState(Player* player, ProgressionState newState);
     void CheckAdjustments(Player* player) const;
-    void ApplyGearStatsTuning(Player* player, float& computedAdjustment, ItemTemplate const* item) const;
     void AdjustVanillaStats(Player* player) const;
     void AdjustTBCStats(Player* player) const;
     void AdjustWotLKStats(Player* player) const;
     bool hasCustomProgressionValue(uint32 creatureEntry);
     bool isExcludedFromProgression(Player* player);
+    void SyncBotsProgressionToLeader(Group* group);
     bool isAttuned(Player* player);
+    void checkIPPhasing(Player* player, uint32 newArea);
     void checkIPProgression(Player* player);	
     void UpdateProgressionQuests(Player* player);
     void UpdateProgressionAchievements(Player* player, uint16 achievementID);
